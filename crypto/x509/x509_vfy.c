@@ -1230,6 +1230,12 @@ static int check_delta_base(X509_CRL *delta, X509_CRL *base)
     /* Base must have a CRL number */
     if (!base->crl_number)
         return 0;
+    /*
+     * ALSYUNDAWY-CVE-2026-28388:
+     * Delta CRL with Delta CRL Indicator but without CRL Number is invalid.
+     */
+    if (!delta->crl_number)
+        return 0;
     /* Issuer names must match */
     if (X509_NAME_cmp(X509_CRL_get_issuer(base), X509_CRL_get_issuer(delta)))
         return 0;

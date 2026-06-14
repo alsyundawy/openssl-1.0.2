@@ -32,9 +32,9 @@ extern "C" {
  */
 # define OPENSSL_VERSION_NUMBER  0x1000225fL
 # ifdef OPENSSL_FIPS
-#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zl-fips  11 Feb 2025"
+#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zl-alsyundawy-u20260614-fips  14 Jun 2026"
 # else
-#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zl  11 Feb 2025"
+#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zl-alsyundawy-u20260614  14 Jun 2026"
 # endif
 # define OPENSSL_VERSION_PTEXT   " part of " OPENSSL_VERSION_TEXT
 

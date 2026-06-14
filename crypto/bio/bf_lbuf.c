@@ -255,10 +255,40 @@ static int linebuffer_write(BIO *b, const char *in, int inl)
      * any, is text that doesn't and with a NL and therefore needs to be
      * saved for the next trip.
      */
-    if (inl > 0) {
-        memcpy(&(ctx->obuf[ctx->obuf_len]), in, inl);
-        ctx->obuf_len += inl;
-        num += inl;
+    /*
+     * ALSYUNDAWY-CVE-2025-68160:
+     * Save remaining data without writing past ctx->obuf on short writes.
+     */
+    while (inl > 0) {
+        size_t avail;
+        size_t to_copy;
+
+        if (ctx->obuf_len < 0 || ctx->obuf_len > ctx->obuf_size)
+            return -1;
+
+        avail = (size_t)ctx->obuf_size - (size_t)ctx->obuf_len;
+
+        if (avail == 0) {
+            i = BIO_write(b->next_bio, ctx->obuf, ctx->obuf_len);
+            if (i <= 0) {
+                BIO_copy_next_retry(b);
+                if (i < 0)
+                    return ((num > 0) ? num : i);
+                return num;
+            }
+
+            if (i < ctx->obuf_len)
+                memmove(ctx->obuf, ctx->obuf + i, ctx->obuf_len - i);
+            ctx->obuf_len -= i;
+            continue;
+        }
+
+        to_copy = ((size_t)inl > avail) ? avail : (size_t)inl;
+        memcpy(&(ctx->obuf[ctx->obuf_len]), in, to_copy);
+        ctx->obuf_len += (int)to_copy;
+        in += to_copy;
+        inl -= (int)to_copy;
+        num += (int)to_copy;
     }
     return num;
 }

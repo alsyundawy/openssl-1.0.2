@@ -553,8 +553,13 @@ static int pkey_rsa_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
         }
         if (type == EVP_PKEY_CTRL_GET_RSA_OAEP_MD)
             *(const EVP_MD **)p2 = rctx->md;
-        else
+        else {
+            if (p2 == NULL) {
+                RSAerr(RSA_F_PKEY_RSA_CTRL, RSA_R_INVALID_DIGEST);
+                return 0;
+            }
             rctx->md = p2;
+        }
         return 1;
 
     case EVP_PKEY_CTRL_MD:
@@ -579,8 +584,13 @@ static int pkey_rsa_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
                 *(const EVP_MD **)p2 = rctx->mgf1md;
             else
                 *(const EVP_MD **)p2 = rctx->md;
-        } else
+        } else {
+            if (p2 == NULL) {
+                RSAerr(RSA_F_PKEY_RSA_CTRL, RSA_R_INVALID_MGF1_MD);
+                return 0;
+            }
             rctx->mgf1md = p2;
+        }
         return 1;
 
     case EVP_PKEY_CTRL_RSA_OAEP_LABEL:

@@ -288,6 +288,19 @@ int CMS_RecipientInfo_kari_decrypt(CMS_ContentInfo *cms,
     CMS_EncryptedContentInfo *ec;
     enckeylen = rek->encryptedKey->length;
     enckey = rek->encryptedKey->data;
+    /*
+     * ALSYUNDAWY-CVE-2026-28389:
+     * KeyAgreeRecipientInfo keyEncryptionAlgorithm parameters are required
+     * by OpenSSL's CMS decrypt path. Reject absent/malformed parameters.
+     */
+    if (ri->d.kari == NULL || ri->d.kari->keyEncryptionAlgorithm == NULL
+        || ri->d.kari->keyEncryptionAlgorithm->algorithm == NULL
+        || ri->d.kari->keyEncryptionAlgorithm->parameter == NULL) {
+        CMSerr(CMS_F_CMS_RECIPIENTINFO_KARI_DECRYPT,
+               CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
+        goto err;
+    }
+
     /* Setup all parameters to derive KEK */
     if (!cms_env_asn1_ctrl(ri, 1))
         goto err;

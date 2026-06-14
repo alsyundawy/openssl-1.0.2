@@ -451,6 +451,18 @@ static int cms_RecipientInfo_ktri_decrypt(CMS_ContentInfo *cms,
     if (EVP_PKEY_decrypt_init(ktri->pctx) <= 0)
         goto err;
 
+    /*
+     * ALSYUNDAWY-CVE-2026-28390:
+     * Reject malformed KeyTransportRecipientInfo algorithm identifiers
+     * before ASN.1/CMS control code examines optional OAEP parameters.
+     */
+    if (ktri->keyEncryptionAlgorithm == NULL
+        || ktri->keyEncryptionAlgorithm->algorithm == NULL) {
+        CMSerr(CMS_F_CMS_RECIPIENTINFO_KTRI_DECRYPT,
+               CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
+        goto err;
+    }
+
     if (!cms_env_asn1_ctrl(ri, 1))
         goto err;
 
@@ -801,6 +813,16 @@ static int cms_RecipientInfo_kekri_decrypt(CMS_ContentInfo *cms,
     if (ukeylen <= 0) {
         CMSerr(CMS_F_CMS_RECIPIENTINFO_KEKRI_DECRYPT, CMS_R_UNWRAP_ERROR);
         goto err;
+    }
+
+    /*
+     * ALSYUNDAWY-HARDENING:
+     * Match KTRI/KARI behaviour: cleanse old content-encryption key before
+     * replacing it, avoiding secret retention and memory leak.
+     */
+    if (ec->key) {
+        OPENSSL_cleanse(ec->key, ec->keylen);
+        OPENSSL_free(ec->key);
     }
 
     ec->key = ukey;

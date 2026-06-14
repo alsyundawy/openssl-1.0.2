@@ -58,6 +58,7 @@
  */
 
 #include <stddef.h>
+#include <limits.h>
 #include <string.h>
 #include <openssl/asn1.h>
 #include <openssl/asn1t.h>
@@ -870,6 +871,17 @@ static int asn1_d2i_ex_primitive(ASN1_VALUE **pval,
     }
 
     /* We now have content length and type: translate into a structure */
+    /*
+     * ALSYUNDAWY-CVE-2026-34180:
+     * asn1_ex_c2i() and many legacy primitive decoders take int lengths.
+     * Reject attacker supplied primitive content that cannot be represented
+     * safely as int before the implicit conversion.
+     */
+    if (len < 0 || len > INT_MAX) {
+        ASN1err(ASN1_F_ASN1_D2I_EX_PRIMITIVE, ASN1_R_TOO_LONG);
+        goto err;
+    }
+
     /* asn1_ex_c2i may reuse allocated buffer, and so sets free_cont to 0 */
     if (!asn1_ex_c2i(pval, cont, len, utype, &free_cont, it))
         goto err;

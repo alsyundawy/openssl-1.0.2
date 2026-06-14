@@ -225,6 +225,16 @@ static int kek_unwrap_key(unsigned char *out, size_t *outlen,
     size_t blocklen = EVP_CIPHER_CTX_block_size(ctx);
     unsigned char *tmp;
     int outl, rv = 0;
+
+    /*
+     * ALSYUNDAWY-CVE-2026-9076:
+     * RFC3211 KEK unwrap is for block ciphers. Reject stream ciphers
+     * whose block size would make the RFC check-byte guard ineffective.
+     */
+    if (blocklen < 4) {
+        return 0;
+    }
+
     if (inlen < 2 * blocklen) {
         /* too small */
         return 0;
@@ -257,7 +267,7 @@ static int kek_unwrap_key(unsigned char *out, size_t *outlen,
         /* Check byte failure */
         goto err;
     }
-    if (inlen < (size_t)(tmp[0] - 4)) {
+    if (inlen < 4 + (size_t)tmp[0]) {
         /* Invalid length value */
         goto err;
     }
@@ -329,32 +339,56 @@ int cms_RecipientInfo_pwri_crypt(CMS_ContentInfo *cms, CMS_RecipientInfo *ri,
     unsigned char *key = NULL;
     size_t keylen;
 
+    if (cms == NULL || cms->d.envelopedData == NULL
+        || cms->d.envelopedData->encryptedContentInfo == NULL) {
+        CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT,
+               CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
+        return 0;
+    }
+
     ec = cms->d.envelopedData->encryptedContentInfo;
+
+    if (ri == NULL || ri->type != CMS_RECIPINFO_PASS || ri->d.pwri == NULL) {
+        CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT, CMS_R_NOT_PWRI);
+        return 0;
+    }
 
     pwri = ri->d.pwri;
     EVP_CIPHER_CTX_init(&kekctx);
 
     if (!pwri->pass) {
         CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT, CMS_R_NO_PASSWORD);
-        return 0;
+        goto err;
     }
     algtmp = pwri->keyEncryptionAlgorithm;
 
-    if (!algtmp || OBJ_obj2nid(algtmp->algorithm) != NID_id_alg_PWRI_KEK) {
+    if (algtmp == NULL || algtmp->algorithm == NULL
+        || OBJ_obj2nid(algtmp->algorithm) != NID_id_alg_PWRI_KEK) {
         CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT,
                CMS_R_UNSUPPORTED_KEY_ENCRYPTION_ALGORITHM);
-        return 0;
+        goto err;
     }
 
-    if (algtmp->parameter->type == V_ASN1_SEQUENCE) {
-        p = algtmp->parameter->value.sequence->data;
-        plen = algtmp->parameter->value.sequence->length;
-        kekalg = d2i_X509_ALGOR(NULL, &p, plen);
+    /*
+     * ALSYUNDAWY-CVE-2026-42766:
+     * keyEncryptionAlgorithm parameters must be present and a SEQUENCE.
+     */
+    if (algtmp->parameter == NULL
+        || algtmp->parameter->type != V_ASN1_SEQUENCE
+        || algtmp->parameter->value.sequence == NULL) {
+        CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT,
+               CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
+        goto err;
     }
+
+    p = algtmp->parameter->value.sequence->data;
+    plen = algtmp->parameter->value.sequence->length;
+    kekalg = d2i_X509_ALGOR(NULL, &p, plen);
+
     if (kekalg == NULL) {
         CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT,
                CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
-        return 0;
+        goto err;
     }
 
     kekcipher = EVP_get_cipherbyobj(kekalg->algorithm);
@@ -375,6 +409,16 @@ int cms_RecipientInfo_pwri_crypt(CMS_ContentInfo *cms, CMS_RecipientInfo *ri,
     }
 
     algtmp = pwri->keyDerivationAlgorithm;
+
+    /*
+     * ALSYUNDAWY-CVE-2026-42766:
+     * PasswordRecipientInfo.keyDerivationAlgorithm is OPTIONAL in ASN.1.
+     */
+    if (algtmp == NULL || algtmp->algorithm == NULL) {
+        CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT,
+               CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
+        goto err;
+    }
 
     /* Finish password based key derivation to setup key in "ctx" */
 
@@ -402,6 +446,13 @@ int cms_RecipientInfo_pwri_crypt(CMS_ContentInfo *cms, CMS_RecipientInfo *ri,
         pwri->encryptedKey->data = key;
         pwri->encryptedKey->length = keylen;
     } else {
+        if (pwri->encryptedKey == NULL || pwri->encryptedKey->data == NULL
+            || pwri->encryptedKey->length <= 0) {
+            CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT,
+                   CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER);
+            goto err;
+        }
+
         key = OPENSSL_malloc(pwri->encryptedKey->length);
 
         if (!key) {
@@ -413,6 +464,15 @@ int cms_RecipientInfo_pwri_crypt(CMS_ContentInfo *cms, CMS_RecipientInfo *ri,
                             pwri->encryptedKey->length, &kekctx)) {
             CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT, CMS_R_UNWRAP_FAILURE);
             goto err;
+        }
+
+        /*
+         * ALSYUNDAWY-HARDENING:
+         * Cleanse old CEK before replacing it with the unwrapped PWRI key.
+         */
+        if (ec->key) {
+            OPENSSL_cleanse(ec->key, ec->keylen);
+            OPENSSL_free(ec->key);
         }
 
         ec->key = key;

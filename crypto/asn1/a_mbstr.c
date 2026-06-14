@@ -59,6 +59,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <limits.h>
 #include "cryptlib.h"
 #include <openssl/asn1.h>
 
@@ -222,20 +223,51 @@ int ASN1_mbstring_ncopy(ASN1_STRING **out, const unsigned char *in, int len,
         break;
 
     case MBSTRING_BMP:
+        /*
+         * ALSYUNDAWY-CVE-2026-7383:
+         * Prevent signed int overflow when computing UTF-16/BMP output size.
+         */
+        if (nchar > INT_MAX / 2) {
+            if (free_out)
+                ASN1_STRING_free(dest);
+            ASN1err(ASN1_F_ASN1_MBSTRING_NCOPY, ASN1_R_STRING_TOO_LONG);
+            return -1;
+        }
         outlen = nchar << 1;
         cpyfunc = cpy_bmp;
         break;
 
     case MBSTRING_UNIV:
+        /*
+         * ALSYUNDAWY-CVE-2026-7383:
+         * Prevent signed int overflow when computing UTF-32/UNIVERSAL output size.
+         */
+        if (nchar > INT_MAX / 4) {
+            if (free_out)
+                ASN1_STRING_free(dest);
+            ASN1err(ASN1_F_ASN1_MBSTRING_NCOPY, ASN1_R_STRING_TOO_LONG);
+            return -1;
+        }
         outlen = nchar << 2;
         cpyfunc = cpy_univ;
         break;
 
     case MBSTRING_UTF8:
         outlen = 0;
-        traverse_string(in, len, inform, out_utf8, &outlen);
+        if (traverse_string(in, len, inform, out_utf8, &outlen) <= 0) {
+            if (free_out)
+                ASN1_STRING_free(dest);
+            ASN1err(ASN1_F_ASN1_MBSTRING_NCOPY, ASN1_R_STRING_TOO_LONG);
+            return -1;
+        }
         cpyfunc = cpy_utf8;
         break;
+    }
+    if (outlen < 0 || outlen == INT_MAX) {
+        if (free_out)
+            ASN1_STRING_free(dest);
+        ASN1err(ASN1_F_ASN1_MBSTRING_NCOPY, ASN1_R_STRING_TOO_LONG);
+        return -1;
     }
     if (!(p = OPENSSL_malloc(outlen + 1))) {
         if (free_out)
@@ -308,8 +340,13 @@ static int in_utf8(unsigned long value, void *arg)
 static int out_utf8(unsigned long value, void *arg)
 {
     int *outlen;
+    int addlen;
+
     outlen = arg;
-    *outlen += UTF8_putc(NULL, -1, value);
+    addlen = UTF8_putc(NULL, -1, value);
+    if (addlen <= 0 || *outlen > INT_MAX - addlen)
+        return -1;
+    *outlen += addlen;
     return 1;
 }
 

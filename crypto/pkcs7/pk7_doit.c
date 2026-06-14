@@ -1208,6 +1208,12 @@ ASN1_OCTET_STRING *PKCS7_digest_from_attributes(STACK_OF(X509_ATTRIBUTE) *sk)
     ASN1_TYPE *astype;
     if (!(astype = get_attribute(sk, NID_pkcs9_messageDigest)))
         return NULL;
+    /*
+     * ALSYUNDAWY-CVE-2026-22796:
+     * Validate ASN1_TYPE union member before accessing value.octet_string.
+     */
+    if (astype->type != V_ASN1_OCTET_STRING)
+        return NULL;
     return astype->value.octet_string;
 }
 
