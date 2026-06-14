@@ -30,7 +30,7 @@
 ![Alt](https://repobeats.axiom.co/api/embed/75c94e83220b44df08a86f6dab16eb33d11cfab8.svg "Repobeats analytics image")
 
 
- ## OpenSSL 1.0.2zl 11 Feb 2025
+ ## OpenSSL-1.0.2zp-Unofficial-Patch
 
  Copyright (c) 1998-2025 The OpenSSL Project
  Copyright (c) 1995-1998 Eric A. Young, Tim J. Hudson
