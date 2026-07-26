@@ -1114,6 +1114,7 @@ printf '    -g -O1 -fno-omit-frame-pointer \\\n'
 printf '    -fsanitize=address,undefined \\\n'
 printf '    -DOPENSSL_NO_HEARTBEATS\n'
 printf '  make depend\n'
+# shellcheck disable=SC2016
 printf '  make -j"$(nproc)"\n'
 printf '  make test\n\n'
 
@@ -1124,6 +1125,7 @@ printf '    -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 \\\n'
 printf '    -Wformat -Wformat-security \\\n'
 printf '    -DOPENSSL_NO_HEARTBEATS\n'
 printf '  make depend\n'
+# shellcheck disable=SC2016
 printf '  make -j"$(nproc)"\n'
 printf '  make test\n\n'
 

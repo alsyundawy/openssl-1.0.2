@@ -126,6 +126,8 @@ static ERR_STRING_DATA CMS_str_functs[] = {
     {ERR_FUNC(CMS_F_CMS_RECEIPT_VERIFY), "cms_Receipt_verify"},
     {ERR_FUNC(CMS_F_CMS_RECIPIENTINFO_DECRYPT), "CMS_RecipientInfo_decrypt"},
     {ERR_FUNC(CMS_F_CMS_RECIPIENTINFO_ENCRYPT), "CMS_RecipientInfo_encrypt"},
+    {ERR_FUNC(CMS_F_CMS_RECIPIENTINFO_KARI_DECRYPT),
+     "CMS_RecipientInfo_kari_decrypt"},
     {ERR_FUNC(CMS_F_CMS_RECIPIENTINFO_KARI_ENCRYPT),
      "cms_RecipientInfo_kari_encrypt"},
     {ERR_FUNC(CMS_F_CMS_RECIPIENTINFO_KARI_GET0_ALG),
