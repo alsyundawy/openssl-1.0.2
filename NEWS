@@ -5,6 +5,35 @@
   This file gives a brief overview of the major changes between each OpenSSL
   release. For more details please read the CHANGES file.
 
+  Major changes between OpenSSL 1.0.2zp and OpenSSL 1.0.2zq [14 Jun 2026]
+
+      o Fixed PKCS7_verify caller-owned BIO use-after-free (CVE-2026-45447)
+      o Fixed CMS PWRI stream-mode KEK cipher OOB read guard (CVE-2026-9076)
+      o Fixed CMS password recipient optional KDF NULL pointer crash
+        (CVE-2026-42766)
+
+  Major changes between OpenSSL 1.0.2zo and OpenSSL 1.0.2zp [12 May 2026]
+
+      o Fixed ASN.1 primitive length overflow (CVE-2026-34180)
+      o Fixed ASN1_mbstring_ncopy integer overflow in string allocation
+        (CVE-2026-7383)
+
+  Major changes between OpenSSL 1.0.2zn and OpenSSL 1.0.2zo [20 Jan 2026]
+
+      o Fixed CMS KARI malformed parameter guard (CVE-2026-28389)
+      o Fixed CMS KTRI malformed algorithm/OAEP parameter guard (CVE-2026-28390)
+      o Fixed PKCS7 digest attribute ASN1_TYPE type confusion (CVE-2026-22796)
+
+  Major changes between OpenSSL 1.0.2zm and OpenSSL 1.0.2zn [10 Sep 2025]
+
+      o Fixed CMS PWRI RFC3211 KEK unwrap length check (CVE-2025-9230)
+      o Fixed Delta CRL missing CRL Number NULL guard (CVE-2026-28388)
+
+  Major changes between OpenSSL 1.0.2zl and OpenSSL 1.0.2zm [15 Apr 2025]
+
+      o Fixed BIO_f_linebuffer short-write heap OOB write (CVE-2025-68160)
+      o Fixed PKCS12_item_decrypt_d2i NULL octet string guard (CVE-2025-69421)
+
   Major changes between OpenSSL 1.0.2zk and OpenSSL 1.0.2zl [11 Feb 2025]
 
       o Fixed timing side-channel in ECDSA signature computation

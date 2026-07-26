@@ -7,6 +7,88 @@
  https://github.com/openssl/openssl/commits/ and pick the appropriate
  release branch.
 
+  Changes between 1.0.2zp and 1.0.2zq [14 Jun 2026]
+
+  *) Fixed PKCS7_verify caller-owned BIO use-after-free.
+
+     Avoid freeing caller-owned indata BIO in PKCS7_verify safe cleanup loop.
+
+     (CVE-2026-45447)
+     [Alsyundawy]
+
+  *) Fixed CMS PWRI stream-mode KEK cipher out-of-bounds read guard.
+
+     Reject stream ciphers and ciphers with block size < 4 in RFC3211 KEK unwrap.
+
+     (CVE-2026-9076)
+     [Alsyundawy]
+
+  *) Fixed CMS password recipient optional KDF NULL pointer crash.
+
+     Validate keyEncryptionAlgorithm parameter sequence and keyDerivationAlgorithm.
+
+     (CVE-2026-42766)
+     [Alsyundawy]
+
+  Changes between 1.0.2zo and 1.0.2zp [12 May 2026]
+
+  *) Fixed ASN.1 primitive length overflow.
+
+     Reject primitive content lengths exceeding INT_MAX before integer conversion.
+
+     (CVE-2026-34180)
+     [Alsyundawy]
+
+  *) Fixed ASN1_mbstring_ncopy integer overflow in string allocation.
+
+     Guard shift calculations for BMP and Universal string types against signed overflow.
+
+     (CVE-2026-7383)
+     [Alsyundawy]
+
+  Changes between 1.0.2zn and 1.0.2zo [20 Jan 2026]
+
+  *) Fixed CMS KARI malformed parameter guard.
+
+     Validate KeyAgreeRecipientInfo keyEncryptionAlgorithm parameters.
+
+     (CVE-2026-28389)
+     [Alsyundawy]
+
+  *) Fixed CMS KTRI malformed algorithm/OAEP parameter guard.
+
+     (CVE-2026-28390)
+     [Alsyundawy]
+
+  *) Fixed PKCS7 digest attribute ASN1_TYPE validation.
+
+     (CVE-2026-22796)
+     [Alsyundawy]
+
+  Changes between 1.0.2zm and 1.0.2zn [10 Sep 2025]
+
+  *) Fixed CMS PWRI RFC3211 KEK unwrap length check.
+
+     (CVE-2025-9230)
+     [Alsyundawy]
+
+  *) Fixed Delta CRL missing CRL Number NULL guard.
+
+     (CVE-2026-28388)
+     [Alsyundawy]
+
+  Changes between 1.0.2zl and 1.0.2zm [15 Apr 2025]
+
+  *) Fixed BIO_f_linebuffer short-write heap OOB write.
+
+     (CVE-2025-68160)
+     [Alsyundawy]
+
+  *) Fixed PKCS12_item_decrypt_d2i NULL octet string guard.
+
+     (CVE-2025-69421)
+     [Alsyundawy]
+
  Changes between 1.0.2zk and 1.0.2zl [11 Feb 2025]
 
  *) Fixed timing side-channel in ECDSA signature computation.
