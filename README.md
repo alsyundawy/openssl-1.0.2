@@ -26,7 +26,7 @@ Anda bebas untuk mengubah, mendistribusikan script ini untuk keperluan anda.
 
 ### Anda Memang Luar Biasa | Harry DS Alsyundawy | Kaum Rebahan Garis Keras & Militan
 
-![Alt](https://repobeats.axiom.co/api/embed/75c94e83220b44df08a86f6dab16eb33d11cfab8.svg "Repobeats analytics image")
+
 
 ## OpenSSL-1.0.2zp-Unofficial-Patch
 
@@ -122,3 +122,6 @@ A number of nations restrict the use or export of cryptography. If you
 are potentially subject to such restrictions you should seek competent
 professional legal advice before attempting to develop or distribute
 cryptographic code.
+
+
+![Alt](https://repobeats.axiom.co/api/embed/75c94e83220b44df08a86f6dab16eb33d11cfab8.svg "Repobeats analytics image")
