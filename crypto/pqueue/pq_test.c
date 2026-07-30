@@ -63,26 +63,33 @@ int main(void)
 {
     pitem *item;
     pqueue pq;
+    unsigned char priority[8] = { 0 };
 
     pq = pqueue_new();
 
-    item = pitem_new(3, NULL);
+    priority[7] = 3;
+    item = pitem_new(priority, NULL);
     pqueue_insert(pq, item);
 
-    item = pitem_new(1, NULL);
+    priority[7] = 1;
+    item = pitem_new(priority, NULL);
     pqueue_insert(pq, item);
 
-    item = pitem_new(2, NULL);
+    priority[7] = 2;
+    item = pitem_new(priority, NULL);
     pqueue_insert(pq, item);
 
-    item = pqueue_find(pq, 1);
-    fprintf(stderr, "found %ld\n", item->priority);
+    priority[7] = 1;
+    item = pqueue_find(pq, priority);
+    fprintf(stderr, "found %d\n", item ? item->priority[7] : 0);
 
-    item = pqueue_find(pq, 2);
-    fprintf(stderr, "found %ld\n", item->priority);
+    priority[7] = 2;
+    item = pqueue_find(pq, priority);
+    fprintf(stderr, "found %d\n", item ? item->priority[7] : 0);
 
-    item = pqueue_find(pq, 3);
-    fprintf(stderr, "found %ld\n", item ? item->priority : 0);
+    priority[7] = 3;
+    item = pqueue_find(pq, priority);
+    fprintf(stderr, "found %d\n", item ? item->priority[7] : 0);
 
     pqueue_print(pq);
 

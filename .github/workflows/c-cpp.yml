@@ -2,22 +2,24 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+
+permissions: read-all
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: configure
-      run: ./configure
+      run: KERNEL_BITS=64 ./config
     - name: make
       run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: test
+      run: make test
