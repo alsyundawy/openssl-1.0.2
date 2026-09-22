@@ -226,16 +226,39 @@ static int dtls1_copy_record(SSL *s, pitem *item)
 
     rdata = (DTLS1_RECORD_DATA *)item->data;
 
-    if (s->s3->rbuf.buf != NULL)
-        OPENSSL_free(s->s3->rbuf.buf);
+    /*
+     * ALSYUNDAWY-CVE-2026-54874:
+     * Preserve s->s3->rbuf without repeatedly freeing and reallocating
+     * the ~16KB read buffer. Copy the buffered packet into s->s3->rbuf.buf.
+     */
+    if (s->s3->rbuf.buf == NULL) {
+        if (!ssl3_setup_buffers(s))
+            return 0;
+    }
 
-    s->packet = rdata->packet;
+    if (s->s3->rbuf.len < rdata->packet_length) {
+        unsigned char *newbuf = OPENSSL_realloc(s->s3->rbuf.buf, rdata->packet_length);
+        if (newbuf == NULL)
+            return 0;
+        s->s3->rbuf.buf = newbuf;
+        s->s3->rbuf.len = rdata->packet_length;
+    }
+
+    memcpy(s->s3->rbuf.buf, rdata->packet, rdata->packet_length);
+    s->packet = s->s3->rbuf.buf;
     s->packet_length = rdata->packet_length;
-    memcpy(&(s->s3->rbuf), &(rdata->rbuf), sizeof(SSL3_BUFFER));
     memcpy(&(s->s3->rrec), &(rdata->rrec), sizeof(SSL3_RECORD));
+    s->s3->rrec.input = &(s->packet[DTLS1_RT_HEADER_LENGTH]);
+    s->s3->rrec.data = s->s3->rrec.input;
 
     /* Set proper sequence number for mac calculation */
     memcpy(&(s->s3->read_sequence[2]), &(rdata->packet[5]), 6);
+
+    if (rdata->packet != NULL) {
+        OPENSSL_free(rdata->packet);
+        rdata->packet = NULL;
+        rdata->rbuf.buf = NULL;
+    }
 
     return (1);
 }
@@ -262,9 +285,26 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
         return -1;
     }
 
-    rdata->packet = s->packet;
+    /*
+     * ALSYUNDAWY-CVE-2026-54874:
+     * Allocate only the actual packet size rather than retaining the entire
+     * ~16KB read buffer for each buffered record. This prevents an attacker
+     * from inducing remote memory exhaustion (amplification ~1200x).
+     */
+    rdata->packet = OPENSSL_malloc(s->packet_length);
+    if (rdata->packet == NULL) {
+        OPENSSL_free(rdata);
+        pitem_free(item);
+        SSLerr(SSL_F_DTLS1_BUFFER_RECORD, ERR_R_INTERNAL_ERROR);
+        return -1;
+    }
+    memcpy(rdata->packet, s->packet, s->packet_length);
     rdata->packet_length = s->packet_length;
-    memcpy(&(rdata->rbuf), &(s->s3->rbuf), sizeof(SSL3_BUFFER));
+
+    memset(&(rdata->rbuf), 0, sizeof(SSL3_BUFFER));
+    rdata->rbuf.buf = rdata->packet;
+    rdata->rbuf.len = s->packet_length;
+
     memcpy(&(rdata->rrec), &(s->s3->rrec), sizeof(SSL3_RECORD));
 
     item->data = rdata;
@@ -281,17 +321,7 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
 
     s->packet = NULL;
     s->packet_length = 0;
-    memset(&(s->s3->rbuf), 0, sizeof(SSL3_BUFFER));
     memset(&(s->s3->rrec), 0, sizeof(SSL3_RECORD));
-
-    if (!ssl3_setup_buffers(s)) {
-        SSLerr(SSL_F_DTLS1_BUFFER_RECORD, ERR_R_INTERNAL_ERROR);
-        if (rdata->rbuf.buf != NULL)
-            OPENSSL_free(rdata->rbuf.buf);
-        OPENSSL_free(rdata);
-        pitem_free(item);
-        return (-1);
-    }
 
     if (pqueue_insert(queue->q, item) == NULL) {
         /* Must be a duplicate so ignore it */

@@ -1,7 +1,7 @@
 ---
 name: Super-Linter
 
-'on':
+"on":
   push:
     branches: [main, master]
   pull_request:
@@ -23,21 +23,18 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Super-Linter
-        uses: super-linter/super-linter@v8
+        uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
           VALIDATE_ALL_CODEBASE: false
-          VALIDATE_PHP_BUILTIN: true
-          VALIDATE_PHP_PHPCS: true
-          VALIDATE_JAVASCRIPT_ES: true
-          VALIDATE_CSS: true
+          VALIDATE_BASH: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_JSON: true
           VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
-          VALIDATE_JSON: true
-          VALIDATE_BASH: true

@@ -246,6 +246,7 @@ static int cms_kek_cipher(unsigned char **pout, size_t *poutlen,
     int rv = 0;
     unsigned char *out = NULL;
     int outlen;
+    size_t outsize;
     keklen = EVP_CIPHER_CTX_key_length(&kari->ctx);
     if (keklen > EVP_MAX_KEY_LENGTH)
         return 0;
@@ -258,7 +259,14 @@ static int cms_kek_cipher(unsigned char **pout, size_t *poutlen,
     /* obtain output length of ciphered key */
     if (!EVP_CipherUpdate(&kari->ctx, NULL, &outlen, in, inlen))
         goto err;
-    out = OPENSSL_malloc(outlen);
+    /*
+     * ALSYUNDAWY-CVE-2026-63072:
+     * When unwrapping a key (enc == 0), the unwrap implementation may write up
+     * to inlen bytes into the output buffer during EVP_CipherUpdate. Ensure
+     * out is sized to at least inlen bytes to prevent a heap buffer overflow.
+     */
+    outsize = (size_t)outlen < inlen ? inlen : (size_t)outlen;
+    out = OPENSSL_malloc(outsize);
     if (!out)
         goto err;
     if (!EVP_CipherUpdate(&kari->ctx, out, &outlen, in, inlen))

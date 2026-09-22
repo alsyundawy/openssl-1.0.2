@@ -7,6 +7,24 @@
  https://github.com/openssl/openssl/commits/ and pick the appropriate
  release branch.
 
+  Changes between 1.0.2zq and 1.0.2zr [25 Aug 2026]
+
+  *) Fixed excessive memory use buffering DTLS records for a future epoch.
+
+     Do not retain entire ~16KB read buffer when buffering future epoch DTLS records;
+     allocate only the record payload size to mitigate memory exhaustion DoS.
+
+     (CVE-2026-54874)
+     [Alsyundawy]
+
+  *) Fixed heap buffer overflow in CMS key unwrapping.
+
+     Ensure unwrap output buffer is sized to at least the ciphertext length in
+     cms_kek_cipher to prevent out-of-bounds write on AES-WRAP-PAD unwrapping.
+
+     (CVE-2026-63072)
+     [Alsyundawy]
+
   Changes between 1.0.2zp and 1.0.2zq [14 Jun 2026]
 
   *) Fixed PKCS7_verify caller-owned BIO use-after-free.
