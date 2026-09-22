@@ -42,6 +42,7 @@
 > 📦 **[`GitHub Releases`](https://github.com/alsyundawy/openssl-1.0.2/releases)** &nbsp;|&nbsp;
 > 🏛️ **[`Technical Specifications (DOCNOTE.md)`](DOCNOTE.md)** &nbsp;|&nbsp;
 > 📜 **[`Detailed Changelog (CHANGELOG.md)`](CHANGELOG.md)** &nbsp;|&nbsp;
+> 🛡️ **[`Security Policy (SECURITY.md)`](SECURITY.md)** &nbsp;|&nbsp;
 > 📰 **[`Release News (NEWS)`](NEWS)** &nbsp;|&nbsp;
 > 💖 **[`Support via PayPal`](https://www.paypal.me/alsyundawy)** &nbsp;|&nbsp;
 > 🇮🇩 **[`QRIS Donation`](#support--donation)**
@@ -51,19 +52,24 @@
 ## 🧭 Navigation
 
 - [Author & Release Metadata](#author--release-metadata)
-- [Technical Specifications (DOCNOTE.md)](DOCNOTE.md)
-- [Release Changelog (CHANGELOG.md)](CHANGELOG.md)
-- [Documentation & Change History](#documentation--change-history)
+- [Documentation Ecosystem & Interconnections](#documentation-ecosystem--interconnections)
 - [Overview](#overview)
 - [Status & Important Disclaimer](#status--important-disclaimer)
-- [Comprehensive CVE Mitigation Matrix](#comprehensive-cve-mitigation-matrix)
-- [Key Hardening Details](#key-hardening-details)
-- [Automated Patching Script (`patch.sh`)](#automated-patching-script-patchsh)
-- [Build & Verification Guide](#build--verification-guide)
+- [Implementation Workflows: Choose Your Path](#implementation-workflows-choose-your-path)
+  - [Workflow A: Direct Compilation from this Pre-Hardened Source (Recommended)](#workflow-a-direct-compilation-from-this-pre-hardened-source-recommended)
+  - [Workflow B: Patching an Untouched Official OpenSSL 1.0.2 Source Tree](#workflow-b-patching-an-untouched-official-openssl-102-source-tree)
+  - [Automated Patching Engine Details (`patch.sh`)](#automated-patching-engine-details-patchsh)
+- [Build Configuration & Compiler Hardening Flags](#build-configuration--compiler-hardening-flags)
   - [Recommended Hardened Configuration](#recommended-hardened-configuration)
   - [Production Hardened Build](#production-hardened-build)
-  - [Sanitizer Debug Build](#sanitizer-debug-build)
-  - [Executing Test Suite](#executing-test-suite)
+  - [Sanitizer Debug Build (ASan / UBSan)](#sanitizer-debug-build-asan--ubsan)
+  - [Configuration Hardening Flags Reference](#configuration-hardening-flags-reference)
+  - [Linking Applications Against This Hardened Build](#linking-applications-against-this-hardened-build)
+- [Comprehensive CVE Mitigation Matrix](#comprehensive-cve-mitigation-matrix)
+- [Key Hardening Details](#key-hardening-details)
+  - [1. DTLS Future Epoch Buffering (CVE-2026-54874)](#1-dtls-future-epoch-buffering-cve-2026-54874)
+  - [2. CMS KEK Unwrapping Buffer Overflow (CVE-2026-63072)](#2-cms-kek-unwrapping-buffer-overflow-cve-2026-63072)
+- [Executing the Cryptographic Test Suite](#executing-the-cryptographic-test-suite)
 - [Repository Architecture](#repository-architecture)
 - [Manual Verification & Audit Checklist](#manual-verification--audit-checklist)
 - [Contributing](#contributing)
@@ -75,20 +81,34 @@
 
 ## Author & Release Metadata
 
-| Metadata Field               | Specification & Value                                                                  |
-| :--------------------------- | :------------------------------------------------------------------------------------- |
-| **Original Author**          | The OpenSSL Project & Eric A. Young, Tim J. Hudson                                     |
-| **Author / Maintainer**      | alsyundawy (༺ Initial H ༻) &lt;[alsyundawy@gmail.com](mailto:alsyundawy@gmail.com)&gt; |
-| **Organization**             | Alsyundawy IT Solution                                                                 |
-| **Website**                  | <https://www.alsyundawy.com>                                                           |
-| **GitHub**                   | <https://github.com/alsyundawy>                                                        |
-| **Location**                 | DKI Jakarta, Indonesia                                                                 |
-| **Base Version**             | `1.0.2zr`                                                                              |
-| **Release Version**          | `1.0.2zr-u20260825-rev4`                                                               |
-| **Release Date**             | `2026-09-23`                                                                           |
-| **Trust Anchor GPG Key**     | `158D99DF8D57040AA8E0EDA58F353DF9007A2BB4`                                             |
-| **Technical Documentation**  | [`DOCNOTE.md`](DOCNOTE.md) (Complete 37-CVE Audit & 13-Dimension Review)               |
-| **Release Changelog**        | [`CHANGELOG.md`](CHANGELOG.md) (Detailed Semantic Versioning & History)                |
+| Metadata Field              | Specification & Value                                                                  |
+| :-------------------------- | :------------------------------------------------------------------------------------- |
+| **Original Author**         | The OpenSSL Project & Eric A. Young, Tim J. Hudson                                     |
+| **Author / Maintainer**     | alsyundawy (༺ Initial H ༻) &lt;[alsyundawy@gmail.com](mailto:alsyundawy@gmail.com)&gt; |
+| **Organization**            | Alsyundawy IT Solution                                                                 |
+| **Website**                 | <https://www.alsyundawy.com>                                                           |
+| **GitHub**                  | <https://github.com/alsyundawy>                                                        |
+| **Location**                | DKI Jakarta, Indonesia                                                                 |
+| **Base Version**            | `1.0.2zr`                                                                              |
+| **Release Version**         | `1.0.2zr-u20260825-rev4`                                                               |
+| **Release Date**            | `2026-09-23`                                                                           |
+| **Trust Anchor GPG Key**    | `158D99DF8D57040AA8E0EDA58F353DF9007A2BB4`                                             |
+| **Technical Documentation** | [`DOCNOTE.md`](DOCNOTE.md) (Complete 37-CVE Audit & 13-Dimension Review)               |
+| **Release Changelog**       | [`CHANGELOG.md`](CHANGELOG.md) (Detailed Semantic Versioning & History)                |
+| **Security Policy**         | [`SECURITY.md`](SECURITY.md) (Vulnerability Reporting & Supported Releases)            |
+
+---
+
+## Documentation Ecosystem & Interconnections
+
+This repository provides four specialized, mutually referenced documentation specifications:
+
+| Document                       | Primary Focus                  | Target Audience               | Key Contents                                                |
+| :----------------------------- | :----------------------------- | :---------------------------- | :---------------------------------------------------------- |
+| [`README.md`](README.md)       | Project Gateway & Build Manual | Developers & Sysadmins        | Workflows A & B, build guide, CVE matrix, installation      |
+| [`DOCNOTE.md`](DOCNOTE.md)     | Deep Technical Architecture    | Security Auditors & SREs      | 37-CVE audit table, memory bounds analysis, rollback        |
+| [`CHANGELOG.md`](CHANGELOG.md) | Semantic Revision History      | Release Engineers & Packagers | Granular diffs (`rev1`–`rev4`), CI supply chain, MegaLinter |
+| [`SECURITY.md`](SECURITY.md)   | Security Policy & Reporting    | Security Teams & Researchers  | Supported releases, security invariants, disclosure SLA     |
 
 ---
 
@@ -100,16 +120,6 @@ This repository provides an **independently maintained, defensive source hardeni
 
 > [!NOTE]
 > All patches in this repository follow strict **ANSI C (C89/C90)** standards, preserving full binary interface (ABI) and API compatibility with existing libraries linked against OpenSSL 1.0.2.
-
----
-
-## Documentation & Change History
-
-Detailed technical documentation and release records are maintained in dedicated project specifications:
-
-- 🏛️ **[Technical Architecture & Patch Notes (`DOCNOTE.md`)](DOCNOTE.md)**: Comprehensive deep dive into memory amplification elimination, 37-CVE authoritative audit table (2020–2026), 13-dimension verification summary, and disaster recovery rollback procedures.
-- 📜 **[Detailed Release History (`CHANGELOG.md`)](CHANGELOG.md)**: Complete chronological change log following the Keep a Changelog standard, documenting all security mitigations, supply-chain CI/CD hardening, MegaLinter zero-error configurations, and patchset revisions (`rev1` through `rev4`).
-- 📰 **[Release News (`NEWS`)](NEWS)**: Concise summary of upstream and unofficial security changes per release.
 
 ---
 
@@ -126,6 +136,170 @@ Expected runtime version string:
 
 ```text
 OpenSSL 1.0.2zr-alsyundawy-u20260825  25 Aug 2026
+```
+
+---
+
+## Implementation Workflows: Choose Your Path
+
+To ensure complete clarity for all developers, sysadmins, and packaging engineers, this project supports two distinct implementation pathways:
+
+| Implementation Workflow                    | Target Scenario                                | Input Source Needed                    | Execution Summary                                                |
+| :----------------------------------------- | :--------------------------------------------- | :------------------------------------- | :--------------------------------------------------------------- |
+| **Workflow A: Direct Build (Recommended)** | Fastest setup, container images, local builds  | This repository (already pre-hardened) | Run `./config ... && make && make test` (no patch script needed) |
+| **Workflow B: In-Tree Patching**           | Air-gapped audits, Debian/RPM distro packaging | Clean official `openssl-1.0.2u.tar.gz` | Copy `patch.sh`, run `./patch.sh`, then compile                  |
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       CHOOSE YOUR IMPLEMENTATION PATH                       │
+├──────────────────────────────────────┬──────────────────────────────────────┤
+│  WORKFLOW A: DIRECT COMPILATION      │  WORKFLOW B: IN-TREE PATCHING        │
+│  (Clone & Build Pre-Hardened Tree)   │  (Patch Untouched Official Archive)  │
+├──────────────────────────────────────┼──────────────────────────────────────┤
+│ 1. git clone ...                     │ 1. Download official openssl-1.0.2u  │
+│ 2. ./config [hardening options]      │ 2. Copy patch.sh & engine into tree  │
+│ 3. make depend && make               │ 3. Run ./patch.sh --dry-run (verify) │
+│ 4. make test                         │ 4. Run ./patch.sh (applies patches)  │
+│ 5. sudo make install                 │ 5. ./config && make && make test     │
+│                                      │                                      │
+│ * No patching scripts required!      │ * Auto-creates backup & rollback!    │
+└──────────────────────────────────────┴──────────────────────────────────────┘
+```
+
+### Workflow A: Direct Compilation from this Pre-Hardened Source (Recommended)
+
+In this Git repository, **all 31 security mitigations and 37 CVE defenses are already permanently applied to the C source files**. You do not need to run any patch script. You can build it immediately just like any standard open source C software:
+
+```bash
+# 1. Clone this repository
+git clone https://github.com/alsyundawy/openssl-1.0.2.git
+cd openssl-1.0.2
+
+# 2. Configure with recommended security hardening options
+./config shared   no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers   -DOPENSSL_NO_HEARTBEATS
+
+# 3. Update build dependencies and compile in parallel
+make depend
+make -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+
+# 4. Verify cryptographic correctness across all test suites
+make test
+
+# 5. (Optional) Install to target system prefix (default: /usr/local/ssl)
+sudo make install
+```
+
+### Workflow B: Patching an Untouched Official OpenSSL 1.0.2 Source Tree
+
+If your organization's policy requires that you start strictly from an authentic, clean upstream source archive (such as `openssl-1.0.2u.tar.gz` from the official OpenSSL archive or Linux distribution package source):
+
+```bash
+# 1. Extract the authentic upstream OpenSSL 1.0.2u archive
+tar -xzf openssl-1.0.2u.tar.gz
+cd openssl-1.0.2u
+
+# 2. Download the standalone patch automation engine from this repository
+curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch.sh
+curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch-openssl-1.0.2u-to-1.0.2zr.sh
+chmod +x patch.sh patch-openssl-1.0.2u-to-1.0.2zr.sh
+
+# 3. Perform a safe, read-only preflight dry-run (no disk modifications)
+./patch.sh --dry-run
+
+# 4. Apply all 31 source patches (automatically generates timestamped backup)
+./patch.sh
+
+# 5. Compile and test the newly hardened tree
+./config shared no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers -DOPENSSL_NO_HEARTBEATS
+make depend
+make -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+make test
+```
+
+#### Disaster Recovery & Rollback
+
+If you need to revert the patched files back to their pristine upstream state:
+
+```bash
+# Automated atomic rollback
+./patch.sh --rollback .openssl102zr-security-backup-YYYYMMDD-HHMMSS
+
+# Or manual copy restoration
+cp -a .openssl102zr-security-backup-YYYYMMDD-HHMMSS/* .
+```
+
+### Automated Patching Engine Details (`patch.sh`)
+
+The script [`patch.sh`](patch.sh) acts as a portable, ShellCheck-compliant wrapper delegating to [`patch-openssl-1.0.2u-to-1.0.2zr.sh`](patch-openssl-1.0.2u-to-1.0.2zr.sh), which executes an 8-phase atomic pipeline:
+
+- **Automatic Non-Destructive Backups**: Preserves target files in `.openssl102zr-security-backup-YYYYMMDD-HHMMSS/`.
+- **Strict Idempotency**: Can be safely executed multiple times without generating duplicate code or compiler errors.
+- **Pattern Auditing**: Verifies that 17+ security markers (`ALSYUNDAWY-CVE-*`) are correctly positioned in the AST.
+- **Environment Checks**: Validates presence of Perl, C compiler, and `make`.
+
+---
+
+## Build Configuration & Compiler Hardening Flags
+
+### Recommended Hardened Configuration
+
+To ensure maximum runtime resistance against network exploits, configure OpenSSL with obsolete protocols and weak ciphers disabled:
+
+```bash
+./config shared   no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers   -DOPENSSL_NO_HEARTBEATS
+```
+
+### Production Hardened Build
+
+Build with modern compiler protection flags (Stack Protector Strong, Fortify Source, and Format Security):
+
+```bash
+make clean || true
+
+./config shared   no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers   -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2   -Wformat -Wformat-security   -DOPENSSL_NO_HEARTBEATS
+
+make depend
+make -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+make test
+```
+
+### Sanitizer Debug Build (ASan / UBSan)
+
+For security audits and fuzzing environments, compile with AddressSanitizer and UndefinedBehaviorSanitizer:
+
+```bash
+make clean || true
+
+./config   no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers   -g -O1 -fno-omit-frame-pointer   -fsanitize=address,undefined   -DOPENSSL_NO_HEARTBEATS
+
+make depend
+make -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+make test
+```
+
+### Configuration Hardening Flags Reference
+
+| Configuration Flag        | Security Benefit & Protection Scope                                                             |
+| :------------------------ | :---------------------------------------------------------------------------------------------- |
+| `no-ssl2`                 | Completely disables the obsolete, cryptographically broken SSLv2 protocol.                      |
+| `no-ssl3`                 | Disables SSLv3 to eliminate vulnerability to POODLE attacks.                                    |
+| `no-comp`                 | Disables TLS-level compression to neutralize CRIME attack side-channels.                        |
+| `no-zlib`                 | Prevents linking against external zlib libraries, eliminating external decompression flaws.     |
+| `no-weak-ssl-ciphers`     | Removes DES, 3DES, RC4, MD5, and export ciphers from the default cipher list.                   |
+| `-DOPENSSL_NO_HEARTBEATS` | Completely eliminates TLS Heartbeats, guaranteeing immunity against Heartbleed (CVE-2014-0160). |
+
+### Linking Applications Against This Hardened Build
+
+When linking custom services, legacy microservices, or web servers (Apache, Nginx, Python) against this custom OpenSSL installation:
+
+```bash
+# Compilation flags
+export CFLAGS="-I/usr/local/ssl/include"
+export LDFLAGS="-L/usr/local/ssl/lib -Wl,-rpath,/usr/local/ssl/lib"
+export PKG_CONFIG_PATH="/usr/local/ssl/lib/pkgconfig"
+
+# Verification of linked library banner
+/usr/local/ssl/bin/openssl version -a
 ```
 
 ---
@@ -152,6 +326,9 @@ The table below outlines all security vulnerabilities analyzed, addressed, and v
 | **CVE-2026-28390** | CMS KTRI (`crypto/cms/cms_env.c`)                | Moderate | **Algorithm Identifier Crash**: Missing algorithm structure in KeyTransportRecipientInfo.                                                   | Verify algorithm pointer validity before examining optional OAEP parameters.                                                |
 | **CVE-2024-13176** | ECDSA Signature (`crypto/ecdsa/`)                | Low      | **Timing Side-Channel**: Non-constant time operations during signature computation.                                                         | Hardened constant-time scalar multiplications and field operations.                                                         |
 | **CVE-2024-9143**  | Elliptic Curve GF(2^m) (`crypto/ec/`)            | Low      | **Out-Of-Bounds Access**: Invalid low-level GF(2^m) polynomial representation.                                                              | Validate polynomial parameters prior to coordinate evaluation.                                                              |
+
+> [!TIP]
+> For the complete 37-CVE authoritative audit covering all OpenSSL 1.0.2 vulnerabilities published from 2020 through 2026, consult [`DOCNOTE.md`](DOCNOTE.md).
 
 ---
 
@@ -184,83 +361,9 @@ out = OPENSSL_malloc(outsize);
 
 ---
 
-## Automated Patching Script (`patch.sh`)
+## Executing the Cryptographic Test Suite
 
-This repository includes a standalone, fully idempotent patch automation and audit script: [`patch.sh`](patch.sh).
-
-### Key Features of `patch.sh`
-
-- **Automatic Backups**: Generates timestamped backups in `.openssl102zr-security-backup-YYYYMMDD-HHMMSS/` prior to any modifications.
-- **Idempotent Python Engine**: Safely re-runs without duplicate code blocks or syntax corruption.
-- **Strict Pattern Auditing**: Verifies 17+ security markers across C source files.
-- **Environment Checks**: Validates presence of Perl, C compiler, and `make`.
-
-### Script Execution Modes
-
-```bash
-# Test run (Dry run, no file writes)
-DRY_RUN=1 ./patch.sh
-
-# Apply all patches and verify integrity
-./patch.sh
-
-# Apply patches and immediately execute sanitizer build
-DO_BUILD=1 ./patch.sh
-```
-
----
-
-## Build & Verification Guide
-
-### Recommended Hardened Configuration
-
-To ensure maximum runtime resistance against network exploits, configure OpenSSL with obsolete protocols and weak ciphers disabled:
-
-```bash
-./config shared \
-  no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers \
-  -DOPENSSL_NO_HEARTBEATS
-```
-
-### Production Hardened Build
-
-Build with modern compiler protection flags (Stack Protector Strong, Fortify Source, and Format Security):
-
-```bash
-make clean || true
-
-./config shared \
-  no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers \
-  -O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 \
-  -Wformat -Wformat-security \
-  -DOPENSSL_NO_HEARTBEATS
-
-make depend
-make -j"$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)"
-make test
-```
-
-### Sanitizer Debug Build
-
-For security audits and fuzzing environments, compile with AddressSanitizer and UndefinedBehaviorSanitizer:
-
-```bash
-make clean || true
-
-./config \
-  no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers \
-  -g -O1 -fno-omit-frame-pointer \
-  -fsanitize=address,undefined \
-  -DOPENSSL_NO_HEARTBEATS
-
-make depend
-make -j"$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)"
-make test
-```
-
-### Executing Test Suite
-
-Verify complete test suite pass rate:
+To verify that all cryptographic transformations, cipher suites, and protocol state engines pass cleanly without regressions:
 
 ```bash
 make test
@@ -305,7 +408,9 @@ openssl-1.0.2/
 ├── DOCNOTE.md                 # In-depth technical patch specifications & architecture
 ├── NEWS                       # Brief overview of security updates per release
 ├── README.md                  # Comprehensive project documentation
+├── SECURITY.md                # Vulnerability disclosure policy and supported releases
 ├── patch.sh                   # Standalone idempotent patching & auditing engine
+├── patch-openssl-1.0.2u-to-1.0.2zr.sh # 8-phase standalone patch implementation
 └── Configure / config         # Build configuration engines
 ```
 

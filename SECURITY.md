@@ -10,6 +10,13 @@
 - **Base Version**: `1.0.2zr`
 - **Release Version**: `1.0.2zr-u20260825-rev4`
 - **Release Date**: 2026-09-23
+- **Primary Documentation**: [`README.md`](README.md)
+- **Technical Architecture**: [`DOCNOTE.md`](DOCNOTE.md)
+- **Release History**: [`CHANGELOG.md`](CHANGELOG.md)
+
+> 📖 **[`Main Documentation (README.md)`](README.md)** &nbsp;|&nbsp;
+> 🏛️ **[`Technical Specifications (DOCNOTE.md)`](DOCNOTE.md)** &nbsp;|&nbsp;
+> 📜 **[`Detailed Changelog (CHANGELOG.md)`](CHANGELOG.md)**
 
 ---
 
