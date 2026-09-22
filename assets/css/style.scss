@@ -1,0 +1,31 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Custom Enhancements for OpenSSL 1.0.2 Security Hardened Fork */
+.markdown-body {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.markdown-body img {
+  max-width: 100%;
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid #0969da;
+  background-color: rgba(9, 105, 218, 0.05);
+  padding: 12px 18px;
+  border-radius: 4px;
+}
+
+.markdown-body table {
+  width: 100%;
+  display: table;
+  border-collapse: collapse;
+}
+
+.markdown-body table th {
+  background-color: #f6f8fa;
+}

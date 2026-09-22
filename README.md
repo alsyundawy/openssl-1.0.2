@@ -1,21 +1,25 @@
 <!-- markdownlint-disable-file MD033 MD041 -->
 
-<div align="center">
+<p align="center">
+  <a href="https://github.com/alsyundawy/openssl-1.0.2">
+    <img src="asset/openssl-hardening-suite.jpg" alt="OpenSSL 1.0.2zr Hardened Suite Flyer" width="100%">
+  </a>
+</p>
 
-[![OpenSSL 1.0.2zr Hardened Suite Flyer](asset/openssl-hardening-suite.jpg)](https://github.com/alsyundawy/openssl-1.0.2)
+<h1 align="center">🔐 OpenSSL 1.0.2 Security Hardened Fork</h1>
 
-# 🔐 OpenSSL 1.0.2 Security Hardened Fork
+<h3 align="center">Production-Grade Unofficial Hardening &amp; CVE Mitigation Patchset for Legacy OpenSSL 1.0.2</h3>
 
-## Production-Grade Unofficial Hardening & CVE Mitigation Patchset for Legacy OpenSSL 1.0.2
-
-[![Release](<https://img.shields.io/badge/Patch_Level-1.0.2zr--u20260825--rev4_(unofficial)-0284c7?style=for-the-badge&logo=openssl&logoColor=white>)](https://github.com/alsyundawy/openssl-1.0.2/releases)
-[![Maintenance Status](https://img.shields.io/badge/Status-Actively%20Hardened-2ea44f?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/alsyundawy/openssl-1.0.2)
-[![Base Version](https://img.shields.io/badge/Base-OpenSSL%201.0.2zr-000000?style=for-the-badge&logo=git&logoColor=white)](https://github.com/openssl/openssl)
-[![Security Updates](https://img.shields.io/badge/Security%20Patching-25%20Aug%202026-blueviolet?style=for-the-badge&logo=googlecloud&logoColor=white)](https://openssl-library.org/news/secadv/20260825.txt)
-[![C89 Strict](https://img.shields.io/badge/Standard-ANSI%20C89%20%2F%20C90-orange?style=for-the-badge&logo=c&logoColor=white)](https://en.wikipedia.org/wiki/ANSI_C)
-[![Security Hardened](https://img.shields.io/badge/Security-37%20CVEs%20Audited%20%26%20Hardened-red?style=for-the-badge&logo=securityscorecard&logoColor=white)](DOCNOTE.md)
-[![Test Suite](<https://img.shields.io/badge/Test_Suite-Passing%20(All%20Tests)-success?style=for-the-badge&logo=checkmarx&logoColor=white>)](DOCNOTE.md)
-[![License](https://img.shields.io/badge/License-Dual%20OpenSSL%20%26%20SSLeay-informational?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
+<p align="center">
+  <a href="https://github.com/alsyundawy/openssl-1.0.2/releases"><img src="https://img.shields.io/badge/Patch_Level-1.0.2zr--u20260825--rev4_(unofficial)-0284c7?style=for-the-badge&logo=openssl&logoColor=white" alt="Release"></a>
+  <a href="https://github.com/alsyundawy/openssl-1.0.2"><img src="https://img.shields.io/badge/Status-Actively%20Hardened-2ea44f?style=for-the-badge&logo=githubactions&logoColor=white" alt="Maintenance Status"></a>
+  <a href="https://github.com/openssl/openssl"><img src="https://img.shields.io/badge/Base-OpenSSL%201.0.2zr-000000?style=for-the-badge&logo=git&logoColor=white" alt="Base Version"></a>
+  <a href="https://openssl-library.org/news/secadv/20260825.txt"><img src="https://img.shields.io/badge/Security%20Patching-25%20Aug%202026-blueviolet?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Security Updates"></a>
+  <a href="https://en.wikipedia.org/wiki/ANSI_C"><img src="https://img.shields.io/badge/Standard-ANSI%20C89%20%2F%20C90-orange?style=for-the-badge&logo=c&logoColor=white" alt="C89 Strict"></a>
+  <a href="DOCNOTE.md"><img src="https://img.shields.io/badge/Security-37%20CVEs%20Audited%20%26%20Hardened-red?style=for-the-badge&logo=securityscorecard&logoColor=white" alt="Security Hardened"></a>
+  <a href="DOCNOTE.md"><img src="https://img.shields.io/badge/Test_Suite-Passing%20(All%20Tests)-success?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Test Suite"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Dual%20OpenSSL%20%26%20SSLeay-informational?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License"></a>
+</p>
 
 <p align="center">
   A source-level, defensive hardening distribution of OpenSSL 1.0.2zr incorporating backported security mitigations from upstream Extended Support advisories up to 1.0.2zr (August 25, 2026).
@@ -40,8 +44,6 @@
 > 📰 **[`Release News`](NEWS)** &nbsp;|&nbsp;
 > 💖 **[`Support via PayPal`](https://www.paypal.me/alsyundawy)** &nbsp;|&nbsp;
 > 🇮🇩 **[`QRIS Donation`](#support--donation)**
-
-</div>
 
 ---
 
@@ -333,11 +335,11 @@ Contributions focusing on backporting verified security fixes or enhancing build
 
 ## Maintainer & Contact
 
-<div align="center">
-
-[![Alsyundawy IT Solution Banner](asset/banner.png)](https://www.alsyundawy.com)
-
-</div>
+<p align="center">
+  <a href="https://www.alsyundawy.com">
+    <img src="asset/banner.png" alt="Alsyundawy IT Solution Banner">
+  </a>
+</p>
 
 ### Harry Dertin Sutisna Alsyundawy (@alsyundawy)
 
@@ -359,11 +361,9 @@ If this hardened repository helps safeguard your systems, legacy equipment, or i
 
 Scan the QRIS barcode below using any Indonesian mobile banking application (BCA, Mandiri, BRI, BNI, BSI, CIMB Niaga, Permata) or e-wallet (GoPay, OVO, DANA, LinkAja, ShopeePay):
 
-<div align="center">
-
-![QRIS Donation Barcode - ALSYUNDAWY](https://github.com/user-attachments/assets/a0126f28-6dde-43da-ba14-d7c9a27de0df)
-
-</div>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a0126f28-6dde-43da-ba14-d7c9a27de0df" alt="QRIS Donation Barcode - ALSYUNDAWY" width="320">
+</p>
 
 - **Merchant / Account Name**: **ALSYUNDAWY IT SOLUTION**
 - **NMID**: **`ID1020021153676`**

@@ -1,0 +1,33 @@
+title: "OpenSSL 1.0.2 Security Hardened Fork"
+description: "Production-grade security hardened fork and backported CVE mitigations for legacy OpenSSL 1.0.2"
+theme: jekyll-theme-primer
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  parse_block_html: true
+
+exclude:
+  - Configure
+  - config
+  - Makefile*
+  - test/
+  - crypto/
+  - ssl/
+  - apps/
+  - doc/
+  - util/
+  - os-dep/
+  - engines/
+  - tools/
+  - demos/
+  - bugs/
+  - certs/
+  - include/
+  - ms/
+  - os2/
+  - shlib/
+  - MacOS/
+  - Netware/
+  - VMS/
