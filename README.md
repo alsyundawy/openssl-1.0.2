@@ -13,7 +13,8 @@
 <p align="center">
   <a href="https://github.com/alsyundawy/openssl-1.0.2/releases"><img src="https://img.shields.io/badge/Patch_Level-1.0.2zr--u20260825--rev4_(unofficial)-0284c7?style=for-the-badge&logo=openssl&logoColor=white" alt="Release"></a>
   <a href="https://github.com/alsyundawy/openssl-1.0.2"><img src="https://img.shields.io/badge/Status-Actively%20Hardened-2ea44f?style=for-the-badge&logo=githubactions&logoColor=white" alt="Maintenance Status"></a>
-  <a href="https://github.com/openssl/openssl"><img src="https://img.shields.io/badge/Base-OpenSSL%201.0.2zr-000000?style=for-the-badge&logo=git&logoColor=white" alt="Base Version"></a>
+  <a href="DOCNOTE.md"><img src="https://img.shields.io/badge/Docs-DOCNOTE.md-0284c7?style=for-the-badge&logo=googledocs&logoColor=white" alt="DOCNOTE Documentation"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-CHANGELOG.md-238636?style=for-the-badge&logo=git&logoColor=white" alt="CHANGELOG"></a>
   <a href="https://openssl-library.org/news/secadv/20260825.txt"><img src="https://img.shields.io/badge/Security%20Patching-25%20Aug%202026-blueviolet?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Security Updates"></a>
   <a href="https://en.wikipedia.org/wiki/ANSI_C"><img src="https://img.shields.io/badge/Standard-ANSI%20C89%20%2F%20C90-orange?style=for-the-badge&logo=c&logoColor=white" alt="C89 Strict"></a>
   <a href="DOCNOTE.md"><img src="https://img.shields.io/badge/Security-37%20CVEs%20Audited%20%26%20Hardened-red?style=for-the-badge&logo=securityscorecard&logoColor=white" alt="Security Hardened"></a>
@@ -39,9 +40,9 @@
 > Built for legacy telecommunications, mission-critical industrial hardware, and legacy embedded appliances where migration to OpenSSL 3.0+ LTS is underway but requires immediate security hardening.
 >
 > 📦 **[`GitHub Releases`](https://github.com/alsyundawy/openssl-1.0.2/releases)** &nbsp;|&nbsp;
-> 🏛️ **[`Technical Specifications`](DOCNOTE.md)** &nbsp;|&nbsp;
-> 📜 **[`Detailed Changelog`](CHANGELOG.md)** &nbsp;|&nbsp;
-> 📰 **[`Release News`](NEWS)** &nbsp;|&nbsp;
+> 🏛️ **[`Technical Specifications (DOCNOTE.md)`](DOCNOTE.md)** &nbsp;|&nbsp;
+> 📜 **[`Detailed Changelog (CHANGELOG.md)`](CHANGELOG.md)** &nbsp;|&nbsp;
+> 📰 **[`Release News (NEWS)`](NEWS)** &nbsp;|&nbsp;
 > 💖 **[`Support via PayPal`](https://www.paypal.me/alsyundawy)** &nbsp;|&nbsp;
 > 🇮🇩 **[`QRIS Donation`](#support--donation)**
 
@@ -50,6 +51,9 @@
 ## 🧭 Navigation
 
 - [Author & Release Metadata](#author--release-metadata)
+- [Technical Specifications (DOCNOTE.md)](DOCNOTE.md)
+- [Release Changelog (CHANGELOG.md)](CHANGELOG.md)
+- [Documentation & Change History](#documentation--change-history)
 - [Overview](#overview)
 - [Status & Important Disclaimer](#status--important-disclaimer)
 - [Comprehensive CVE Mitigation Matrix](#comprehensive-cve-mitigation-matrix)
@@ -71,18 +75,20 @@
 
 ## Author & Release Metadata
 
-| Metadata Field           | Specification & Value                                                                  |
-| :----------------------- | :------------------------------------------------------------------------------------- |
-| **Original Author**      | The OpenSSL Project & Eric A. Young, Tim J. Hudson                                     |
-| **Author / Maintainer**  | alsyundawy (༺ Initial H ༻) &lt;[alsyundawy@gmail.com](mailto:alsyundawy@gmail.com)&gt; |
-| **Organization**         | Alsyundawy IT Solution                                                                 |
-| **Website**              | <https://www.alsyundawy.com>                                                           |
-| **GitHub**               | <https://github.com/alsyundawy>                                                        |
-| **Location**             | DKI Jakarta, Indonesia                                                                 |
-| **Base Version**         | `1.0.2zr`                                                                              |
-| **Release Version**      | `1.0.2zr-u20260825-rev4`                                                               |
-| **Release Date**         | `2026-09-23`                                                                           |
-| **Trust Anchor GPG Key** | `158D99DF8D57040AA8E0EDA58F353DF9007A2BB4`                                             |
+| Metadata Field               | Specification & Value                                                                  |
+| :--------------------------- | :------------------------------------------------------------------------------------- |
+| **Original Author**          | The OpenSSL Project & Eric A. Young, Tim J. Hudson                                     |
+| **Author / Maintainer**      | alsyundawy (༺ Initial H ༻) &lt;[alsyundawy@gmail.com](mailto:alsyundawy@gmail.com)&gt; |
+| **Organization**             | Alsyundawy IT Solution                                                                 |
+| **Website**                  | <https://www.alsyundawy.com>                                                           |
+| **GitHub**                   | <https://github.com/alsyundawy>                                                        |
+| **Location**                 | DKI Jakarta, Indonesia                                                                 |
+| **Base Version**             | `1.0.2zr`                                                                              |
+| **Release Version**          | `1.0.2zr-u20260825-rev4`                                                               |
+| **Release Date**             | `2026-09-23`                                                                           |
+| **Trust Anchor GPG Key**     | `158D99DF8D57040AA8E0EDA58F353DF9007A2BB4`                                             |
+| **Technical Documentation**  | [`DOCNOTE.md`](DOCNOTE.md) (Complete 37-CVE Audit & 13-Dimension Review)               |
+| **Release Changelog**        | [`CHANGELOG.md`](CHANGELOG.md) (Detailed Semantic Versioning & History)                |
 
 ---
 
@@ -94,6 +100,16 @@ This repository provides an **independently maintained, defensive source hardeni
 
 > [!NOTE]
 > All patches in this repository follow strict **ANSI C (C89/C90)** standards, preserving full binary interface (ABI) and API compatibility with existing libraries linked against OpenSSL 1.0.2.
+
+---
+
+## Documentation & Change History
+
+Detailed technical documentation and release records are maintained in dedicated project specifications:
+
+- 🏛️ **[Technical Architecture & Patch Notes (`DOCNOTE.md`)](DOCNOTE.md)**: Comprehensive deep dive into memory amplification elimination, 37-CVE authoritative audit table (2020–2026), 13-dimension verification summary, and disaster recovery rollback procedures.
+- 📜 **[Detailed Release History (`CHANGELOG.md`)](CHANGELOG.md)**: Complete chronological change log following the Keep a Changelog standard, documenting all security mitigations, supply-chain CI/CD hardening, MegaLinter zero-error configurations, and patchset revisions (`rev1` through `rev4`).
+- 📰 **[Release News (`NEWS`)](NEWS)**: Concise summary of upstream and unofficial security changes per release.
 
 ---
 
@@ -292,6 +308,9 @@ openssl-1.0.2/
 ├── patch.sh                   # Standalone idempotent patching & auditing engine
 └── Configure / config         # Build configuration engines
 ```
+
+> [!TIP]
+> For in-depth patch design, memory analysis, and full CVE breakdown, consult [`DOCNOTE.md`](DOCNOTE.md). For detailed release history, see [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
