@@ -8,12 +8,12 @@
 
 ## Production-Grade Unofficial Hardening & CVE Mitigation Patchset for Legacy OpenSSL 1.0.2
 
-[![Release](<https://img.shields.io/badge/Patch_Level-1.0.2zr--u20260825--rev3_(unofficial)-0284c7?style=for-the-badge&logo=openssl&logoColor=white>)](https://github.com/alsyundawy/openssl-1.0.2/releases)
+[![Release](<https://img.shields.io/badge/Patch_Level-1.0.2zr--u20260825--rev4_(unofficial)-0284c7?style=for-the-badge&logo=openssl&logoColor=white>)](https://github.com/alsyundawy/openssl-1.0.2/releases)
 [![Maintenance Status](https://img.shields.io/badge/Status-Actively%20Hardened-2ea44f?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/alsyundawy/openssl-1.0.2)
 [![Base Version](https://img.shields.io/badge/Base-OpenSSL%201.0.2zr-000000?style=for-the-badge&logo=git&logoColor=white)](https://github.com/openssl/openssl)
 [![Security Updates](https://img.shields.io/badge/Security%20Patching-25%20Aug%202026-blueviolet?style=for-the-badge&logo=googlecloud&logoColor=white)](https://openssl-library.org/news/secadv/20260825.txt)
 [![C89 Strict](https://img.shields.io/badge/Standard-ANSI%20C89%20%2F%20C90-orange?style=for-the-badge&logo=c&logoColor=white)](https://en.wikipedia.org/wiki/ANSI_C)
-[![Security Hardened](https://img.shields.io/badge/Security-16%2B%20CVEs%20Hardened-red?style=for-the-badge&logo=securityscorecard&logoColor=white)](DOCNOTE.md)
+[![Security Hardened](https://img.shields.io/badge/Security-37%20CVEs%20Audited%20%26%20Hardened-red?style=for-the-badge&logo=securityscorecard&logoColor=white)](DOCNOTE.md)
 [![Test Suite](<https://img.shields.io/badge/Test_Suite-Passing%20(All%20Tests)-success?style=for-the-badge&logo=checkmarx&logoColor=white>)](DOCNOTE.md)
 [![License](https://img.shields.io/badge/License-Dual%20OpenSSL%20%26%20SSLeay-informational?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 
@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="https://github.com/alsyundawy/openssl-1.0.2/releases">
-    <img src="https://img.shields.io/badge/🚀_Download_Latest_Patchset-u20260825--rev3-238636?style=for-the-badge&logo=github&logoColor=white" alt="Download Latest Release">
+    <img src="https://img.shields.io/badge/🚀_Download_Latest_Patchset-u20260825--rev4-238636?style=for-the-badge&logo=github&logoColor=white" alt="Download Latest Release">
   </a>
   <a href="https://github.com/alsyundawy/openssl-1.0.2/tree/main">
     <img src="https://img.shields.io/badge/📦_Source_Tree-View_Main-0284c7?style=for-the-badge&logo=github&logoColor=white" alt="View Source Tree">
@@ -78,7 +78,7 @@
 | **GitHub**               | <https://github.com/alsyundawy>                                                        |
 | **Location**             | DKI Jakarta, Indonesia                                                                 |
 | **Base Version**         | `1.0.2zr`                                                                              |
-| **Release Version**      | `1.0.2zr-u20260825-rev3`                                                               |
+| **Release Version**      | `1.0.2zr-u20260825-rev4`                                                               |
 | **Release Date**         | `2026-09-23`                                                                           |
 | **Trust Anchor GPG Key** | `158D99DF8D57040AA8E0EDA58F353DF9007A2BB4`                                             |
 

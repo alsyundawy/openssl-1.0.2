@@ -9,7 +9,7 @@
 - GitHub: <https://github.com/alsyundawy>
 - Location: DKI Jakarta, Indonesia
 - Base Version: 1.0.2zr
-- Release Version: 1.0.2zr-u20260825-rev3
+- Release Version: 1.0.2zr-u20260825-rev4
 - Release Date: 2026-09-23
 
 ---
@@ -24,7 +24,7 @@
 - GitHub: <https://github.com/alsyundawy>
 - Location: DKI Jakarta, Indonesia
 - Base Version: 1.0.2zr
-- Release Version: 1.0.2zr-u20260825-rev3
+- Release Version: 1.0.2zr-u20260825-rev4
 - Release Date: 2026-09-23
 
 ### 1. Execution Environment & Behavior
@@ -74,6 +74,14 @@
 ---
 
 ## Release Notes (CHANGELOG)
+
+### Version 1.0.2zr-u20260825-rev4 (Comprehensive CVE Audit & Modular Engine Release - 2026-09-23)
+
+- [SECURITY / AUDIT] Complete audit and verification of all 37 official OpenSSL 1.0.2 CVEs (2020–2026).
+- [PROVENANCE] Standardized explicit UNVERIFIED marking for unofficial hardening identifier CVE-2026-63072 (mapped to upstream CVE-2025-9230).
+- [ENGINE] Implemented modular 8-phase patch engine `patch-openssl-1.0.2u-to-1.0.2zr.sh` with `--dry-run`, `--build`, `--test`, and `--rollback`.
+- [STATIC ANALYSIS] 100% compliance with ShellCheck and Trunk code quality linters across all repo assets.
+- [TEST SUITE] Verified 100% test pass on ARM64 Darwin test suite (1908 constant-time tests, DTLS 0 & 1, ASN.1 encoding/decoding, OCSP).
 
 ### Version 1.0.2zr-u20260825-rev3 (Security & Correctness Release - 2026-09-23)
 

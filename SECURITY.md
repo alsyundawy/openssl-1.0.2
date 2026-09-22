@@ -8,8 +8,8 @@
 - **GitHub**: <https://github.com/alsyundawy>
 - **Location**: DKI Jakarta, Indonesia
 - **Base Version**: `1.0.2zr`
-- **Release Version**: `1.0.2zr-u20260825-rev3`
-- **Release Date**: 2026-09-21
+- **Release Version**: `1.0.2zr-u20260825-rev4`
+- **Release Date**: 2026-09-23
 
 ---
 
@@ -19,10 +19,11 @@ This repository provides an independent, defensive security hardening backport t
 
 | Version Branch            | Release Identifier       | Security Support Status          | Recommended Action                     |
 | :------------------------ | :----------------------- | :------------------------------- | :------------------------------------- |
-| **1.0.2zr (Unofficial)**  | `1.0.2zr-u20260825-rev3` | :white_check_mark: **Supported** | Active community defensive patchset    |
-| **1.0.2zq (Unofficial)**  | `1.0.2zq-u20260614`      | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev3      |
-| **1.0.2zp (Unofficial)**  | `1.0.2zp-u20260407`      | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev3      |
-| **1.0.2zo (Unofficial)**  | `1.0.2zo-u20260127`      | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev3      |
+| **1.0.2zr (Unofficial)**  | `1.0.2zr-u20260825-rev4` | :white_check_mark: **Supported** | Active community defensive patchset    |
+| **1.0.2zr (Unofficial)**  | `1.0.2zr-u20260825-rev3` | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev4      |
+| **1.0.2zq (Unofficial)**  | `1.0.2zq-u20260614`      | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev4      |
+| **1.0.2zp (Unofficial)**  | `1.0.2zp-u20260407`      | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev4      |
+| **1.0.2zo (Unofficial)**  | `1.0.2zo-u20260127`      | :arrow_up: **Superseded**        | Upgrade to 1.0.2zr-u20260825-rev4      |
 | **1.0.2u (Upstream EOL)** | `1.0.2u (2019-12-20)`    | :x: **Vulnerable**               | Apply this hardening patch immediately |
 | **< 1.0.2**               | All older versions       | :x: **Obsolete**                 | Not supported                          |
 
