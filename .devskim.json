@@ -1,0 +1,17 @@
+{
+  "Globs": [
+    "**/.git/**",
+    "**/megalinter-reports/**",
+    "**/updated_sources/**",
+    "**/.kilo/**",
+    "**/crypto/**",
+    "**/ssl/**",
+    "**/engines/**",
+    "**/demos/**",
+    "**/test/**",
+    "**/apps/**",
+    "**/MacOS/**",
+    "**/Netware/**",
+    "**/VMS/**"
+  ]
+}

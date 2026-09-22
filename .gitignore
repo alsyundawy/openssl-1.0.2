@@ -2,3 +2,8 @@
 .agent/
 .trunk/
 .openssl102zr-security-backup-*/
+.kilo/
+megalinter-reports/
+updated_sources/
+.idea/
+.vscode/

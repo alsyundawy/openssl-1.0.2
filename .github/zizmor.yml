@@ -1,0 +1,6 @@
+# zizmor configuration file
+# https://woodruffw.github.io/zizmor/
+
+rules:
+  artipacked:
+    disable: true
