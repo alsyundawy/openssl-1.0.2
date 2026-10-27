@@ -36,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **Dedicated Enterprise Delta Patch Engine (`patch-openssl-1.0.2zl-to-1.0.2zs.sh`)**:
   - Implemented 8-phase standalone patch engine tailored for official `openssl-1.0.2zl.tar.gz` commercial archives.
-  - Applies strictly the 17 delta CVE mitigations published between 2025 and 2026 (1.0.2zm through 1.0.2zs).
+  - Applies strictly the 16 delta CVE mitigations published between 2025 and 2026 (1.0.2zm through 1.0.2zs).
   - Built-in dry-run (`--dry-run`), automated compilation (`--build`), test suite verification (`--test`), and atomic rollback (`--rollback`).
 - **Dedicated Public Community Patch Engine (`patch-openssl-1.0.2u-to-1.0.2zs.sh`)**:
   - Upgraded standalone patch engine for public `openssl-1.0.2u.tar.gz` archives, applying all 40 cumulative security mitigations (2020 through 2026).

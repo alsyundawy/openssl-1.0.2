@@ -368,6 +368,21 @@ if "1.0.2zs-alsyundawy-u20260929" not in data:
         '#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zs-alsyundawy-u20260929  29 Sep 2026"',
         1
     )
+    data = data.replace(
+        '# define OPENSSL_VERSION_NUMBER  0x1000215fL',
+        '# define OPENSSL_VERSION_NUMBER  0x100022dfL',
+        1
+    )
+    data = data.replace(
+        '#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2u  20 Dec 2019"',
+        '#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zs-alsyundawy-u20260929  29 Sep 2026"',
+        1
+    )
+    data = data.replace(
+        '#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2u-fips  20 Dec 2019"',
+        '#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.0.2zs-alsyundawy-u20260929-fips  29 Sep 2026"',
+        1
+    )
     if data == before:
         fail("Version label: string OpenSSL 1.0.2 standar tidak ditemukan")
     write(rel, data)

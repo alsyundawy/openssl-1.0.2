@@ -37,7 +37,7 @@
   - [3.2 Relative CRLDP Excessive Memory Allocation (CVE-2026-35189)](#32-relative-crldp-excessive-memory-allocation-cve-2026-35189)
   - [3.3 Timing Side-Channel in Generic EC Scalar Multiplication (CVE-2026-54872)](#33-timing-side-channel-in-generic-ec-scalar-multiplication-cve-2026-54872)
   - [3.4 DTLS Record Layer Memory Amplification (CVE-2026-54874)](#34-dtls-record-layer-memory-amplification-cve-2026-54874)
-  - [3.5 CMS KARI KEK Unwrap Buffer Sizing (CVE-2026-63072 / CVE-2025-9230)](#35-cms-kari-kek-unwrap-buffer-sizing-cve-2026-63072--cve-2025-9230)
+  - [3.5 CMS PWRI RFC 3211 KEK Unwrap Length Validation (CVE-2025-9230)](#35-cms-pwri-rfc-3211-kek-unwrap-length-validation-cve-2025-9230)
   - [3.6 PKCS#7 Verification Use-After-Free (CVE-2026-45447)](#36-pkcs7-verification-use-after-free-cve-2026-45447)
   - [3.7 ASN.1 Primitive Content & Multibyte Boundaries (CVE-2026-34180, CVE-2026-7383)](#37-asn1-primitive-content--multibyte-boundaries-cve-2026-34180-cve-2026-7383)
   - [3.8 CMS Password-Based Encryption Bounds (CVE-2026-9076, CVE-2026-42766, CVE-2025-9230)](#38-cms-password-based-encryption-bounds-cve-2026-9076-cve-2026-42766-cve-2025-9230)
@@ -80,7 +80,7 @@ The foundational vendor tree of this repository is rebased directly on the authe
 - **Official SHA-512**: `ea965ec91e2aa0b3ee1e479c3c130efae93f7cbb1fa89551c6c52643a3ab80613866299f0da9fa979148d88e0780f2d908ba6abce79c4a037abf3e9a1175ec0a`
 - **Official Baseline Scope**: Contains all official OpenSSL security fixes from 1.0.2u up to 1.0.2zl (covering CVE-2020-1968 through CVE-2024-13176).
 
-On top of this authentic 1.0.2zl baseline, our hardening patchset brings the source tree to full **OpenSSL 1.0.2zs** standard (September 29, 2026), mitigating all 17 delta vulnerabilities published across 1.0.2zm, 1.0.2zn, 1.0.2zp, 1.0.2zq, 1.0.2zr, and 1.0.2zs.
+On top of this authentic 1.0.2zl baseline, our hardening patchset brings the source tree to full **OpenSSL 1.0.2zs** standard (September 29, 2026), mitigating all 16 delta vulnerabilities published across 1.0.2zm, 1.0.2zn, 1.0.2zp, 1.0.2zq, 1.0.2zr, and 1.0.2zs.
 
 Expected runtime version string:
 
@@ -106,7 +106,7 @@ To eliminate operational ambiguity, this repository supports two distinct implem
 ├──────────────────────────────────────┼──────────────────────────────────────┤
 │ • Git clone this repository          │ • Path B1 (Enterprise): 1.0.2zl base │
 │ • Rebased on official 1.0.2zl        │   Run patch-openssl-1.0.2zl-to-zs.sh │
-│ • All 17 delta patches pre-applied   │   (17 delta CVE mitigations)         │
+│ • All 16 delta patches pre-applied   │   (16 delta CVE mitigations)         │
 │ • Full 40 CVEs covered natively      │ • Path B2 (Public): 1.0.2u base      │
 │ • No patch script required           │   Run patch-openssl-1.0.2u-to-zs.sh  │
 │ • Build directly with ./config       │   (40 cumulative CVE mitigations)    │
@@ -149,7 +149,7 @@ To eliminate operational ambiguity, this repository supports two distinct implem
 ### 1.2. Workflow B1: Enterprise In-Tree Patching on Official OpenSSL 1.0.2zl
 
 - **Architecture**:
-  For enterprise environments with access to the official upstream `openssl-1.0.2zl.tar.gz` archive, the dedicated script [`patch-openssl-1.0.2zl-to-1.0.2zs.sh`](patch-openssl-1.0.2zl-to-1.0.2zs.sh) applies strictly the 17 delta CVE mitigations (2025–2026) required to elevate 1.0.2zl to 1.0.2zs.
+  For enterprise environments with access to the official upstream `openssl-1.0.2zl.tar.gz` archive, the dedicated script [`patch-openssl-1.0.2zl-to-1.0.2zs.sh`](patch-openssl-1.0.2zl-to-1.0.2zs.sh) applies strictly the 16 delta CVE mitigations (2025–2026) required to elevate 1.0.2zl to 1.0.2zs.
 - **Execution Protocol**:
 
   ```bash
@@ -347,23 +347,21 @@ The following inventory lists all 40 vulnerabilities affecting OpenSSL 1.0.2 pub
   memcpy(rdata->packet, s->packet, s->packet_length);
   ```
 
-### 3.5. CMS KARI KEK Unwrap Buffer Sizing (CVE-2026-63072 / CVE-2025-9230)
+### 3.5. CMS RFC 3211 KEK Unwrap Length Validation (CVE-2025-9230)
 
-- **Subsystem**: `crypto/cms/cms_kari.c` (`cms_kek_cipher`)
+- **Subsystem**: `crypto/cms/cms_pwri.c` (`cms_RecipientInfo_pwri_crypt`)
 - **Severity**: Moderate
-- **Status**: `UNVERIFIED (Unofficial Hardening Identifier)`
-- **Vulnerability Mechanism**: In AES key unwrap routines, if `EVP_CipherUpdate` writes more bytes than `outlen` during error paths or padding discrepancies, destination buffers sized solely to `outlen` can experience heap buffer overflows. The official upstream vulnerability addressing KEK unwrap bounds is **CVE-2025-9230**.
+- **Status**: Verified Upstream Vulnerability (Note: upstream `CVE-2026-63072` explicitly does not affect OpenSSL 1.0.2)
+- **Vulnerability Mechanism**: In RFC 3211 symmetric key unwrapping, invalid cipher block alignments and missing unwrap length boundary validation allowed out-of-bounds heap memory access.
 - **Defensive Mitigation**:
-  Allocates destination buffer sized to at least `inlen` bytes to prevent heap buffer overflow during unwrapping:
+  Enforces cipher block boundary alignment and minimum unwrap length verification before reading key material:
 
   ```c
-  /*
-   * ALSYUNDAWY-CVE-2026-63072 [UNVERIFIED / Hardening]:
-   * When unwrapping a key (enc == 0), ensure out is sized to at least
-   * inlen bytes to prevent a heap buffer overflow.
-   */
-  outsize = (size_t)outlen < inlen ? inlen : (size_t)outlen;
-  out = OPENSSL_malloc(outsize);
+  /* ALSYUNDAWY-CVE-2025-9230: RFC 3211 unwrap boundary and length validation */
+  if (inlen < 4 || (inlen % blocksize) != 0) {
+      CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT, CMS_R_CIPHER_INITIALISATION_ERROR);
+      return 0;
+  }
   ```
 
 ### 3.6. PKCS#7 Verification Use-After-Free (CVE-2026-45447)
@@ -455,7 +453,7 @@ make test
 Verify all security markers in the source files:
 
 ```bash
-# 1. Inspect ALSYUNDAWY CVE markers (expected: >= 25 instances)
+# 1. Inspect ALSYUNDAWY CVE markers (expected: >= 23 instances)
 grep -R "ALSYUNDAWY-CVE-" crypto/ ssl/
 
 # 2. Inspect CMS memory cleansing markers

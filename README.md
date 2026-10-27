@@ -71,7 +71,7 @@
   - [2. CRLDP Relative Name Parsing & Memory Bounds (CVE-2026-35189)](#2-crldp-relative-name-parsing--memory-bounds-cve-2026-35189)
   - [3. Generic EC Scalar Multiplication Constant-Time Ladder (CVE-2026-54872)](#3-generic-ec-scalar-multiplication-constant-time-ladder-cve-2026-54872)
   - [4. DTLS Future Epoch Buffering (CVE-2026-54874)](#4-dtls-future-epoch-buffering-cve-2026-54874)
-  - [5. CMS KEK Unwrapping Buffer Overflow (CVE-2026-63072 / CVE-2025-9230)](#5-cms-kek-unwrapping-buffer-overflow-cve-2026-63072--cve-2025-9230)
+  - [5. CMS RFC 3211 KEK Unwrap Length Validation (CVE-2025-9230)](#5-cms-rfc-3211-kek-unwrap-length-validation-cve-2025-9230)
   - [6. PKCS#7 Verification Use-After-Free (CVE-2026-45447)](#6-pkcs7-verification-use-after-free-cve-2026-45447)
 - [Comprehensive CVE Mitigation Matrix (40 Audited CVEs)](#comprehensive-cve-mitigation-matrix-40-audited-cves)
 - [14-Dimension Code Review Verification](#14-dimension-code-review-verification)
@@ -108,13 +108,14 @@
 
 ## Documentation Ecosystem & Interconnections
 
-This repository provides four specialized, mutually referenced documentation specifications:
+This repository provides five specialized, mutually referenced documentation specifications:
 
 | Document                       | Primary Focus                  | Target Audience               | Key Contents                                                |
 | :----------------------------- | :----------------------------- | :---------------------------- | :---------------------------------------------------------- |
 | [`README.md`](README.md)       | Project Gateway & Build Manual | Developers & Sysadmins        | Workflows A, B1 & B2, build guide, CVE matrix, installation |
 | [`DOCNOTE.md`](DOCNOTE.md)     | Deep Technical Architecture    | Security Auditors & SREs      | 40-CVE audit table, memory bounds analysis, rollback        |
 | [`CHANGELOG.md`](CHANGELOG.md) | Semantic Revision History      | Release Engineers & Packagers | Granular diffs (`rev1`), 1.0.2zl rebase, MegaLinter         |
+| [`openssl-1.0.2zs-final-code-review.md`](openssl-1.0.2zs-final-code-review.md) | 14-Dimension Code Review | Security Auditors & QA Leads  | 14 checklist dimensions, test evidence, C89 validation      |
 | [`SECURITY.md`](SECURITY.md)   | Security Policy & Reporting    | Security Teams & Researchers  | Supported releases, security invariants, disclosure SLA     |
 
 ---
@@ -158,7 +159,7 @@ To ensure complete clarity for all developers, sysadmins, and packaging engineer
 | Implementation Workflow | Target Scenario | Input Source Needed | Execution Summary |
 | :--- | :--- | :--- | :--- |
 | **Workflow A: Direct Build (Recommended)** | Fastest setup, containers, local builds | This repository (already pre-hardened on 1.0.2zl) | Run `./config ... && make && make test` (no patch script needed) |
-| **Workflow B1: Enterprise Patching (from 1.0.2zl)** | Enterprise with official 1.0.2zl archive | Clean official `openssl-1.0.2zl.tar.gz` | Run `./patch-openssl-1.0.2zl-to-1.0.2zs.sh` (17 delta CVEs) |
+| **Workflow B1: Enterprise Patching (from 1.0.2zl)** | Enterprise with official 1.0.2zl archive | Clean official `openssl-1.0.2zl.tar.gz` | Run `./patch-openssl-1.0.2zl-to-1.0.2zs.sh` (16 delta CVEs) |
 | **Workflow B2: Public Patching (from 1.0.2u)** | Air-gapped audits, distro PKG packaging | Clean official `openssl-1.0.2u.tar.gz` | Run `./patch-openssl-1.0.2u-to-1.0.2zs.sh` (40 cumulative CVEs) |
 
 ```text
@@ -169,12 +170,12 @@ To ensure complete clarity for all developers, sysadmins, and packaging engineer
 │  (Clone & Build Pre-Hardened Tree)   │  (Patch Untouched Vendor Archive)    │
 ├──────────────────────────────────────┼──────────────────────────────────────┤
 │ 1. git clone ...                     │ [B1 - Enterprise 1.0.2zl]            │
-│ 2. ./config [hardening options]      │ 1. Extract openssl-1.0.2zl.tar.gz    │
+│ 2. ./config [hardening options]      │ 1. Download openssl-1.0.2zl.tar.gz   │
 │ 3. make depend && make               │ 2. Run ./patch-openssl-1.0.2zl-to-   │
 │ 4. make test                         │    1.0.2zs.sh --build --test         │
 │ 5. sudo make install                 │                                      │
 │                                      │ [B2 - Public 1.0.2u]                 │
-│                                      │ 1. Extract openssl-1.0.2u.tar.gz     │
+│                                      │ 1. Download openssl-1.0.2u.tar.gz    │
 │                                      │ 2. Run ./patch.sh --build --test     │
 │ * No patching scripts required!      │ * Auto-creates backup & rollback!    │
 └──────────────────────────────────────┴──────────────────────────────────────┘
@@ -182,7 +183,7 @@ To ensure complete clarity for all developers, sysadmins, and packaging engineer
 
 ### Workflow A: Direct Compilation from this Pre-Hardened Source (Recommended)
 
-In this Git repository, **all 40 security mitigations are already permanently applied to the C source files** on top of the authentic 1.0.2zl baseline. You do not need to run any patch script:
+In this Git repository, **the 16 delta security mitigations are already permanently applied to the C source files** on top of the authentic 1.0.2zl baseline (which natively carries the 24 CVE fixes from 2020 through 2024, providing complete 40-CVE protection). You do not need to run any patch script:
 
 ```bash
 # 1. Clone this repository
@@ -207,10 +208,11 @@ sudo make install
 
 ### Workflow B1: Enterprise Patching from Official OpenSSL 1.0.2zl
 
-If your enterprise environment holds an authentic commercial copy of `openssl-1.0.2zl.tar.gz`:
+Both the authentic `openssl-1.0.2zl.tar.gz` archive and the patch engine are available directly from the [GitHub Release](https://github.com/alsyundawy/openssl-1.0.2/releases/tag/1.0.2zs-u20260929-rev1):
 
 ```bash
-# 1. Extract official openssl-1.0.2zl
+# 1. Download official openssl-1.0.2zl archive from release assets
+curl -fsSL -O https://github.com/alsyundawy/openssl-1.0.2/releases/download/1.0.2zs-u20260929-rev1/openssl-1.0.2zl.tar.gz
 tar -xzf openssl-1.0.2zl.tar.gz
 cd openssl-1.0.2zl
 
@@ -218,17 +220,18 @@ cd openssl-1.0.2zl
 curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch-openssl-1.0.2zl-to-1.0.2zs.sh
 chmod +x patch-openssl-1.0.2zl-to-1.0.2zs.sh
 
-# 3. Verify and apply 17 delta security mitigations
+# 3. Verify and apply 16 delta security mitigations (2025-2026)
 ./patch-openssl-1.0.2zl-to-1.0.2zs.sh --dry-run
 ./patch-openssl-1.0.2zl-to-1.0.2zs.sh --build --test
 ```
 
 ### Workflow B2: Public Patching from Untouched OpenSSL 1.0.2u
 
-If your organization's policy requires starting strictly from the public upstream source archive (`openssl-1.0.2u.tar.gz`):
+Both the authentic `openssl-1.0.2u.tar.gz` archive and the patch engine are available directly from the [GitHub Release](https://github.com/alsyundawy/openssl-1.0.2/releases/tag/1.0.2zs-u20260929-rev1):
 
 ```bash
-# 1. Extract the authentic upstream OpenSSL 1.0.2u archive
+# 1. Download the authentic upstream OpenSSL 1.0.2u archive from release assets
+curl -fsSL -O https://github.com/alsyundawy/openssl-1.0.2/releases/download/1.0.2zs-u20260929-rev1/openssl-1.0.2u.tar.gz
 tar -xzf openssl-1.0.2u.tar.gz
 cd openssl-1.0.2u
 
@@ -240,7 +243,7 @@ chmod +x patch.sh patch-openssl-1.0.2u-to-1.0.2zs.sh
 # 3. Perform a safe, read-only preflight dry-run (no disk modifications)
 ./patch.sh --dry-run
 
-# 4. Apply all 40 cumulative security mitigations
+# 4. Apply all 40 cumulative security mitigations (2020-2026)
 ./patch.sh --build --test
 ```
 
@@ -258,7 +261,7 @@ cp -a .openssl102zs-security-backup-YYYYMMDD-HHMMSS/* .
 
 ### Automated Patching Engine Details
 
-- **[`patch-openssl-1.0.2zl-to-1.0.2zs.sh`](patch-openssl-1.0.2zl-to-1.0.2zs.sh)**: Dedicated engine for authentic 1.0.2zl trees applying 17 delta CVE mitigations (2025–2026).
+- **[`patch-openssl-1.0.2zl-to-1.0.2zs.sh`](patch-openssl-1.0.2zl-to-1.0.2zs.sh)**: Dedicated engine for authentic 1.0.2zl trees applying 16 delta CVE mitigations (2025–2026).
 - **[`patch-openssl-1.0.2u-to-1.0.2zs.sh`](patch-openssl-1.0.2u-to-1.0.2zs.sh)**: Dedicated engine for 1.0.2u trees applying all 40 cumulative CVE mitigations (2020–2026).
 - **[`patch.sh`](patch.sh)**: ShellCheck-clean wrapper providing unified CLI syntax (`--dry-run`, `--build`, `--test`, `--rollback`).
 
@@ -273,6 +276,9 @@ cp -a .openssl102zs-security-backup-YYYYMMDD-HHMMSS/* .
   no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers \
   -DOPENSSL_NO_HEARTBEATS
 ```
+
+> [!TIP]
+> On 64-bit macOS systems where `./config` may default to 32-bit compilation, use `./Configure darwin64-x86_64-cc shared no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers -DOPENSSL_NO_HEARTBEATS`.
 
 ### Production Hardened Build
 
@@ -391,14 +397,16 @@ memcpy(rdata->packet, s->packet, s->packet_length);
 rdata->packet_length = s->packet_length;
 ```
 
-### 5. CMS KEK Unwrapping Buffer Overflow (CVE-2026-63072 / CVE-2025-9230)
+### 5. CMS RFC 3211 KEK Unwrap Length Validation (CVE-2025-9230)
 
-Enforces maximum unwrap buffer allocation in `cms_kek_cipher()`:
+Enforces strict block boundary checks and length validation on unwrap destination buffers in `crypto/cms/cms_pwri.c` prior to symmetric key extraction, preventing heap buffer over-reads.
 
 ```c
-/* Safe destination buffer sizing in crypto/cms/cms_kari.c */
-outsize = (size_t)outlen < inlen ? inlen : (size_t)outlen;
-out = OPENSSL_malloc(outsize);
+/* Bounds verification in crypto/cms/cms_pwri.c */
+if (inlen < 4 || (inlen % blocksize) != 0) {
+    CMSerr(CMS_F_CMS_RECIPIENTINFO_PWRI_CRYPT, CMS_R_CIPHER_INITIALISATION_ERROR);
+    return 0;
+}
 ```
 
 ### 6. PKCS#7 Verification Use-After-Free (CVE-2026-45447)
@@ -418,7 +426,7 @@ while (p7bio != NULL && p7bio != indata) {
 
 ## Comprehensive CVE Mitigation Matrix (40 Audited CVEs)
 
-The table below summarizes the 40 vulnerabilities mitigated in this hardening distribution (2020 through 2026):
+The table below summarizes the 40 official vulnerabilities affecting OpenSSL 1.0.2 published by the OpenSSL Project between 2020-01-01 and 2026-09-29:
 
 | CVE Identifier | Severity | Affected Subsystem | Vulnerability Description & Mitigation Strategy |
 | :--- | :--- | :--- | :--- |
@@ -426,7 +434,6 @@ The table below summarizes the 40 vulnerabilities mitigated in this hardening di
 | **CVE-2026-35189** | Low/Mod | X.509 CRLDP (`crypto/x509v3/`, `crypto/x509/`) | Excessive memory allocation parsing relative CRLDP names. Mitigated by on-demand computation and entry limits. |
 | **CVE-2026-54872** | Low/Mod | EC Primitives (`crypto/ec/ec_mult.c`) | Timing side-channel in generic scalar ladder for non-NIST curves. Mitigated by constant-time fixed limb width padding. |
 | **CVE-2026-54874** | Low | DTLS Record Layer (`ssl/d1_pkt.c`) | Future epoch record buffering memory amplification. Mitigated by wire-length allocation. |
-| **CVE-2026-63072** | Moderate | CMS KARI (`crypto/cms/cms_kari.c`) | Heap buffer overflow in KEK unwrapping (RFC 3211). Mitigated by sizing destination buffer to `inlen`. |
 | **CVE-2026-45447** | High | PKCS#7 (`crypto/pkcs7/pk7_smime.c`) | Heap use-after-free on `indata` BIO. Mitigated by bounded iterative BIO pop traversal. |
 | **CVE-2026-34180** | Moderate | ASN.1 Parser (`crypto/asn1/tasn_dec.c`) | Primitive content length integer overflow. Mitigated by bounds checks against `INT_MAX`. |
 | **CVE-2026-7383** | Moderate | ASN.1 String (`crypto/asn1/a_mbstr.c`) | Heap out-of-bounds write in multibyte string conversion. Mitigated by bit-shift overflow checks. |
@@ -441,7 +448,7 @@ The table below summarizes the 40 vulnerabilities mitigated in this hardening di
 | **CVE-2025-9230** | Moderate | CMS PWRI (`crypto/cms/cms_pwri.c`) | RFC 3211 KEK unwrap out-of-bounds read. Mitigated by bound-checked length comparisons. |
 | **CVE-2024-13176** | Low | ECDSA (`crypto/bn/`) | Timing side-channel in ECDSA signature computation. Mitigated by constant-time fixed-top arithmetic. |
 | **CVE-2024-9143** | Low | EC GF(2^m) (`crypto/ec/`) | Invalid low-level GF($2^m$) polynomial parameters leading to OOB memory access. Mitigated by parameter validation. |
-| **CVE-2020-1968 - CVE-2024-5535** | Various | Core Crypto, ASN.1, TLS | 21 earlier upstream vulnerabilities (Raccoon attack, EDIPARTYNAME, Bleichenbacher, etc.) fully resolved in baseline. |
+| **CVE-2020-1968 - CVE-2024-5535** | Various | Core Crypto, ASN.1, TLS | 22 earlier upstream vulnerabilities (Raccoon attack, EDIPARTYNAME, Bleichenbacher, etc.) fully resolved in baseline. |
 
 > [!TIP]
 > For the complete 40-CVE authoritative audit covering all OpenSSL 1.0.2 vulnerabilities published from 2020 through 2026, consult [`DOCNOTE.md`](DOCNOTE.md).
@@ -523,6 +530,7 @@ openssl-1.0.2/
 ├── NEWS                                   # Brief overview of security updates per release
 ├── README.md                              # Comprehensive project documentation
 ├── SECURITY.md                            # Vulnerability disclosure policy and supported releases
+├── openssl-1.0.2zs-final-code-review.md   # 14-Dimension Code Review & Audit Report
 ├── patch.sh                               # Unified standalone idempotent patching wrapper
 ├── patch-openssl-1.0.2zl-to-1.0.2zs.sh    # Dedicated 1.0.2zl -> 1.0.2zs enterprise patch engine
 ├── patch-openssl-1.0.2u-to-1.0.2zs.sh     # Dedicated 1.0.2u -> 1.0.2zs community patch engine
@@ -536,7 +544,7 @@ openssl-1.0.2/
 To independently verify all security markers and structural guards:
 
 ```bash
-# 1. Verify all ALSYUNDAWY security markers in C sources (Expected: >= 25)
+# 1. Verify all ALSYUNDAWY security markers in C sources (Expected: >= 23)
 grep -R "ALSYUNDAWY-CVE-" crypto/ ssl/
 
 # 2. Verify CMS memory cleanup hardening markers
