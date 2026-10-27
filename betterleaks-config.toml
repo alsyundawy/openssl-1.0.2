@@ -1,0 +1,14 @@
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+    '(^|/)\.git/',
+    '(^|/)megalinter\-reports/',
+    '(^|/)updated_sources/',
+    '(^|/)apps/',
+    '(^|/)certs/',
+    '(^|/)test/',
+    '(^|/)ms/',
+    '(^|/)demos/',
+]

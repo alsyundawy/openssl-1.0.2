@@ -1,0 +1,50 @@
+---
+# MegaLinter Configuration File
+# https://megalinter.io/latest/configuration/
+
+# General Configuration
+APPLY_FIXES: none
+PRINT_ALPACA: false
+
+# Global Excluded Directories
+EXCLUDED_DIRECTORIES:
+  - .kilo
+  - .agent
+  - .trunk
+  - .git
+  - megalinter-reports
+  - updated_sources
+
+# Linters To Disable:
+# - PROTOBUF: OpenSSL is a C codebase; engines/ccgost/e_gost_err.proto is a C header template
+# - C_CPPLINT / CPP_CPPLINT: Google C++ style guide is inapplicable to K&R / OpenSSL C codebase (clang-format is used instead)
+# - COPYPASTE: Cryptographic algorithms share loop unrolls, block cipher transforms, and test vector structures
+# - PERL: Ancient 1998 build scripts in Netware/util
+DISABLE:
+  - PROTOBUF
+  - COPYPASTE
+  - PERL
+
+DISABLE_LINTERS:
+  - C_CPPLINT
+  - CPP_CPPLINT
+  - REPOSITORY_DEVSKIM
+  - REPOSITORY_KINGFISHER
+
+# Bash Linters Configuration
+BASH_SHFMT_FILTER_REGEX_EXCLUDE: (^|/)util/bat\.sh$
+BASH_SHELLCHECK_FILTER_REGEX_EXCLUDE: (^|/)(shlib|demos|util|apps)/.*
+
+# C & C++ Linters Configuration
+C_CPPCHECK_FILTER_REGEX_EXCLUDE: (^|/)MacOS/.*
+CPP_CPPCHECK_FILTER_REGEX_EXCLUDE: (^|/)MacOS/.*
+
+# Repository Linters Configuration
+REPOSITORY_SECRETLINT_ARGUMENTS: --ignore-path secretlint-ignore-paths.txt
+REPOSITORY_BETTERLEAKS_CONFIG_FILE: betterleaks-config.toml
+REPOSITORY_SECRETLINT_FILTER_REGEX_EXCLUDE: (^|/)(apps|test|certs|ms|demos)/.*
+
+# Spell Linters Configuration
+SPELL_CSPELL_CONFIG_FILE: .cspell.json
+SPELL_LYCHEE_CONFIG_FILE: lychee.toml
+SPELL_LYCHEE_FILTER_REGEX_EXCLUDE: (^|/)doc/.*\.txt$

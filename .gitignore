@@ -1,0 +1,11 @@
+.DS_Store
+.agent/
+.trunk/
+.openssl102zr-security-backup-*/
+.openssl102zs-*-backup-*/
+.openssl102zs-from-zl-backup-*/
+.kilo/
+megalinter-reports/
+updated_sources/
+.idea/
+.vscode/
