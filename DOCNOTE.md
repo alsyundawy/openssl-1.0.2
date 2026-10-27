@@ -7,7 +7,8 @@
 - **Website**: <https://www.alsyundawy.com>
 - **GitHub**: <https://github.com/alsyundawy>
 - **Location**: DKI Jakarta, Indonesia
-- **Base Version**: `1.0.2zs`
+- **Base Version**: `1.0.2zl official` (VMware Photon OS 3 Commercial Upstream Baseline)
+- **Hardened Release Version**: `1.0.2zs` (`OPENSSL_VERSION_NUMBER 0x100022dfL`)
 - **Release Version**: `1.0.2zs-u20260929-rev1`
 - **Release Date**: 2026-09-29
 - **Trust Anchor GPG Key**: `158D99DF8D57040AA8E0EDA58F353DF9007A2BB4`
@@ -23,22 +24,23 @@
 
 - [Author & Release Metadata](#author--release-metadata)
 - [Documentation Ecosystem & Cross-References](#documentation-ecosystem--cross-references)
-- [Status & Operational Scope](#status--operational-scope)
-- [1. Dual Implementation Architecture: Direct Build vs. In-Tree Patch Engine](#1-dual-implementation-architecture-direct-build-vs-in-tree-patch-engine)
+- [Status, Operational Scope & Upstream Provenance](#status-operational-scope--upstream-provenance)
+- [1. Dual Implementation Architecture: Direct Build vs. In-Tree Patch Engines](#1-dual-implementation-architecture-direct-build-vs-in-tree-patch-engines)
   - [1.1 Workflow A: Direct Compilation from this Pre-Hardened Tree (Recommended)](#11-workflow-a-direct-compilation-from-this-pre-hardened-tree-recommended)
-  - [1.2 Workflow B: In-Tree Patching on Official Upstream OpenSSL 1.0.2 Source](#12-workflow-b-in-tree-patching-on-official-upstream-openssl-102-source)
-  - [1.3 The 8-Phase Patch Engine Architecture (`patch-openssl-1.0.2u-to-1.0.2zr.sh`)](#13-the-8-phase-patch-engine-architecture-patch-openssl-102u-to-102zrsh)
-  - [1.4 Disaster Recovery & Atomic Rollback Protocol](#14-disaster-recovery--atomic-rollback-protocol)
-- [2. Complete OpenSSL 1.0.2 Vulnerability Inventory (2020–2026)](#2-complete-openssl-102-vulnerability-inventory-20202026)
+  - [1.2 Workflow B1: Enterprise In-Tree Patching on Official OpenSSL 1.0.2zl](#12-workflow-b1-enterprise-in-tree-patching-on-official-openssl-102zl)
+  - [1.3 Workflow B2: In-Tree Patching on Public Upstream OpenSSL 1.0.2u](#13-workflow-b2-in-tree-patching-on-public-upstream-openssl-102u)
+  - [1.4 The 8-Phase Patch Engine Architecture](#14-the-8-phase-patch-engine-architecture)
+  - [1.5 Disaster Recovery & Atomic Rollback Protocol](#15-disaster-recovery--atomic-rollback-protocol)
+- [2. Complete OpenSSL 1.0.2 Vulnerability Inventory (40 CVEs, 2020–2026)](#2-complete-openssl-102-vulnerability-inventory-40-cves-20202026)
 - [3. Deep Technical Vulnerability Analysis & Hardening Details](#3-deep-technical-vulnerability-analysis--hardening-details)
-  - [3.1 DTLS Record Layer Memory Amplification (CVE-2026-54874)](#31-dtls-record-layer-memory-amplification-cve-2026-54874)
-  - [3.2 CMS KARI KEK Unwrap Buffer Sizing (CVE-2026-63072 / CVE-2025-9230)](#32-cms-kari-kek-unwrap-buffer-sizing-cve-2026-63072--cve-2025-9230)
-  - [3.3 PKCS#7 Verification Use-After-Free (CVE-2026-45447)](#33-pkcs7-verification-use-after-free-cve-2026-45447)
-  - [3.4 ASN.1 Primitive Content & Multibyte Boundaries (CVE-2026-34180, CVE-2026-7383)](#34-asn1-primitive-content--multibyte-boundaries-cve-2026-34180-cve-2026-7383)
-  - [3.5 CMS Password-Based Encryption Bounds (CVE-2026-9076, CVE-2026-42766, CVE-2025-9230)](#35-cms-password-based-encryption-bounds-cve-2026-9076-cve-2026-42766-cve-2025-9230)
-  - [3.6 DTLS Retransmits From Stale Buffer Offset (CVE-2026-84782)](#36-dtls-retransmits-from-stale-buffer-offset-cve-2026-84782)
-  - [3.7 Excessive Memory Allocation in Relative CRLDP (CVE-2026-35189)](#37-excessive-memory-allocation-in-relative-crldp-cve-2026-35189)
-  - [3.8 Timing Side-Channel in Generic EC Scalar Multiplication (CVE-2026-54872)](#38-timing-side-channel-in-generic-ec-scalar-multiplication-cve-2026-54872)
+  - [3.1 DTLS Handshake Retransmission Out-Of-Bounds Read (CVE-2026-84782)](#31-dtls-handshake-retransmission-out-of-bounds-read-cve-2026-84782)
+  - [3.2 Relative CRLDP Excessive Memory Allocation (CVE-2026-35189)](#32-relative-crldp-excessive-memory-allocation-cve-2026-35189)
+  - [3.3 Timing Side-Channel in Generic EC Scalar Multiplication (CVE-2026-54872)](#33-timing-side-channel-in-generic-ec-scalar-multiplication-cve-2026-54872)
+  - [3.4 DTLS Record Layer Memory Amplification (CVE-2026-54874)](#34-dtls-record-layer-memory-amplification-cve-2026-54874)
+  - [3.5 CMS KARI KEK Unwrap Buffer Sizing (CVE-2026-63072 / CVE-2025-9230)](#35-cms-kari-kek-unwrap-buffer-sizing-cve-2026-63072--cve-2025-9230)
+  - [3.6 PKCS#7 Verification Use-After-Free (CVE-2026-45447)](#36-pkcs7-verification-use-after-free-cve-2026-45447)
+  - [3.7 ASN.1 Primitive Content & Multibyte Boundaries (CVE-2026-34180, CVE-2026-7383)](#37-asn1-primitive-content--multibyte-boundaries-cve-2026-34180-cve-2026-7383)
+  - [3.8 CMS Password-Based Encryption Bounds (CVE-2026-9076, CVE-2026-42766, CVE-2025-9230)](#38-cms-password-based-encryption-bounds-cve-2026-9076-cve-2026-42766-cve-2025-9230)
 - [4. Build & Validation Procedures](#4-build--validation-procedures)
   - [4.1 Production Hardened Build](#41-production-hardened-build)
   - [4.2 Sanitizer Validation Build (ASan / UBSan)](#42-sanitizer-validation-build-asan--ubsan)
@@ -46,9 +48,9 @@
 - [5. Verification & Rollback Procedures](#5-verification--rollback-procedures)
   - [5.1 Symbol & Marker Inspection](#51-symbol--marker-inspection)
   - [5.2 Atomic Rollback Execution](#52-atomic-rollback-execution)
-- [6. MegaLinter Zero-Error Compliance & 13-Dimension Code Review](#6-megalinter-zero-error-compliance--13-dimension-code-review)
-  - [6.1 MegaLinter Remediation Architecture](#61-megalinter-remediation-architecture)
-  - [6.2 13-Dimension Verification Summary](#62-13-dimension-verification-summary)
+- [6. Comprehensive 14-Point Production Code Review & Verification](#6-comprehensive-14-point-production-code-review--verification)
+  - [6.1 Multi-Linter Remediation Architecture](#61-multi-linter-remediation-architecture)
+  - [6.2 14-Dimension Verification Matrix](#62-14-dimension-verification-matrix)
 - [7. Important Notice & Migration Roadmap](#7-important-notice--migration-roadmap)
 
 ---
@@ -60,19 +62,27 @@ This technical architecture note operates alongside three companion specificatio
 | Document | File Path | Purpose & Scope |
 | :--- | :--- | :--- |
 | **Main Gateway** | [`README.md`](README.md) | High-level project manual, dual implementation workflows, visual overview, and quickstart |
-| **Technical Specs** | [`DOCNOTE.md`](DOCNOTE.md) | Architectural deep dive, 37-CVE audit (2020–2026), 8-phase engine mechanics, and disaster recovery |
-| **Release Changelog** | [`CHANGELOG.md`](CHANGELOG.md) | Granular revision history (`rev1`–`rev4`), CI/CD hardening, and Keep a Changelog entries |
+| **Technical Specs** | [`DOCNOTE.md`](DOCNOTE.md) | Architectural deep dive, 40-CVE audit (2020–2026), 8-phase engine mechanics, and disaster recovery |
+| **Release Changelog** | [`CHANGELOG.md`](CHANGELOG.md) | Granular revision history (`rev1`), 1.0.2zl official rebase, and Keep a Changelog entries |
 | **Security Policy** | [`SECURITY.md`](SECURITY.md) | Supported branch versions, responsible disclosure SLA, and core security invariants |
 
 ---
 
-## Status & Operational Scope
+## Status, Operational Scope & Upstream Provenance
 
 This repository is an **unofficial OpenSSL 1.0.2zs hardening distribution**.
 
-Upstream public OpenSSL 1.0.2 reached End-of-Life (EOL) on December 31, 2019. Subsequent maintenance releases (1.0.2v through 1.0.2zs) are commercially restricted Extended Support versions maintained by the OpenSSL Project for enterprise contracts. This community project provides independent, clean-room source-level security patches backported to open source trees, ensuring legacy systems can mitigate documented vulnerabilities without commercial licensing barriers.
+### Upstream Provenance & Rebase Baseline
 
-Expected runtime version string after patching:
+The foundational vendor tree of this repository is rebased directly on the authentic, official upstream commercial distribution of **OpenSSL 1.0.2zl** (released 11 February 2025, extracted from VMware Photon OS 3 official commercial release source package `openssl-1.0.2zl-1.ph3.src.rpm`):
+
+- **Vendor Archive**: `openssl-1.0.2zl.tar.gz`
+- **Official SHA-512**: `ea965ec91e2aa0b3ee1e479c3c130efae93f7cbb1fa89551c6c52643a3ab80613866299f0da9fa979148d88e0780f2d908ba6abce79c4a037abf3e9a1175ec0a`
+- **Official Baseline Scope**: Contains all official OpenSSL security fixes from 1.0.2u up to 1.0.2zl (covering CVE-2020-1968 through CVE-2024-13176).
+
+On top of this authentic 1.0.2zl baseline, our hardening patchset brings the source tree to full **OpenSSL 1.0.2zs** standard (September 29, 2026), mitigating all 17 delta vulnerabilities published across 1.0.2zm, 1.0.2zn, 1.0.2zp, 1.0.2zq, 1.0.2zr, and 1.0.2zs.
+
+Expected runtime version string:
 
 ```text
 OpenSSL 1.0.2zs-alsyundawy-u20260929  29 Sep 2026
@@ -83,7 +93,7 @@ OpenSSL 1.0.2zs-alsyundawy-u20260929  29 Sep 2026
 
 ---
 
-## 1. Dual Implementation Architecture: Direct Build vs. In-Tree Patch Engine
+## 1. Dual Implementation Architecture: Direct Build vs. In-Tree Patch Engines
 
 To eliminate operational ambiguity, this repository supports two distinct implementation pathways depending on your organization's deployment and security model:
 
@@ -92,20 +102,22 @@ To eliminate operational ambiguity, this repository supports two distinct implem
 │                 OPENSSL 1.0.2zs IMPLEMENTATION PATHWAYS                     │
 ├──────────────────────────────────────┬──────────────────────────────────────┤
 │  WORKFLOW A: DIRECT COMPILATION      │  WORKFLOW B: IN-TREE PATCHING        │
-│  (Pre-Hardened Git Repository)       │  (Clean Vanilla Upstream Tarball)    │
+│  (Pre-Hardened Git Repository)       │  (Clean Upstream Vendor Tarball)     │
 ├──────────────────────────────────────┼──────────────────────────────────────┤
-│ • Git clone this repository          │ • Download upstream openssl-1.0.2u   │
-│ • All 34 patches pre-applied         │ • Copy patch.sh & engine into tree   │
-│ • No patch script required           │ • Execute 8-phase automated engine   │
-│ • Build directly with ./config       │ • Automated timestamped backup       │
-│ • Ideal for rapid deployment         │ • Ideal for compliance & distro PKGs │
+│ • Git clone this repository          │ • Path B1 (Enterprise): 1.0.2zl base │
+│ • Rebased on official 1.0.2zl        │   Run patch-openssl-1.0.2zl-to-zs.sh │
+│ • All 17 delta patches pre-applied   │   (17 delta CVE mitigations)         │
+│ • Full 40 CVEs covered natively      │ • Path B2 (Public): 1.0.2u base      │
+│ • No patch script required           │   Run patch-openssl-1.0.2u-to-zs.sh  │
+│ • Build directly with ./config       │   (40 cumulative CVE mitigations)    │
+│ • Ideal for rapid deployment         │ • Automated timestamped backup       │
 └──────────────────────────────────────┴──────────────────────────────────────┘
 ```
 
 ### 1.1. Workflow A: Direct Compilation from this Pre-Hardened Tree (Recommended)
 
 - **Architecture**:
-  In this repository, the source tree (`crypto/`, `ssl/`) has **already been fully patched** to `1.0.2zs-u20260929-rev1`. Every security boundary, wire-length memory allocation, and bounds check is natively present in the C source files.
+  In this repository, the source tree (`crypto/`, `ssl/`) has **already been fully patched** to `1.0.2zs-u20260929-rev1` on top of authentic upstream `1.0.2zl`. Every security boundary, wire-length memory allocation, and bounds check is natively present in the C source files.
 - **When to Use**:
   Recommended for developers, system administrators, and container builds where you simply require a modern, hardened OpenSSL 1.0.2 build ready to compile immediately.
 - **Execution Protocol**:
@@ -132,53 +144,63 @@ To eliminate operational ambiguity, this repository supports two distinct implem
   ```
 
 > [!NOTE]
-> When using Workflow A, you **do not need to execute `patch.sh`**. All patches are already permanently integrated into the repository code.
+> When using Workflow A, you **do not need to execute any patch script**. All patches are already permanently integrated into the repository code.
 
-### 1.2. Workflow B: In-Tree Patching on Official Upstream OpenSSL 1.0.2 Source
+### 1.2. Workflow B1: Enterprise In-Tree Patching on Official OpenSSL 1.0.2zl
 
 - **Architecture**:
-  For organizations with strict governance policies requiring verifiable provenance from an untouched upstream source archive (e.g., `openssl-1.0.2u.tar.gz` downloaded directly from `ftp.openssl.org` or distro mirrors), we provide the standalone patch automation engine: [`patch.sh`](patch.sh) and [`patch-openssl-1.0.2u-to-1.0.2zr.sh`](patch-openssl-1.0.2u-to-1.0.2zr.sh).
-- **When to Use**:
-  Recommended for Debian package building (`.dsc`), Red Hat RPM `.spec` builds, Alpine APKBUILDs, Yocto/BitBake embedded layers, or air-gapped security audits.
+  For enterprise environments with access to the official upstream `openssl-1.0.2zl.tar.gz` archive, the dedicated script [`patch-openssl-1.0.2zl-to-1.0.2zs.sh`](patch-openssl-1.0.2zl-to-1.0.2zs.sh) applies strictly the 17 delta CVE mitigations (2025–2026) required to elevate 1.0.2zl to 1.0.2zs.
 - **Execution Protocol**:
 
   ```bash
-  # 1. Extract the pristine, official upstream tarball
+  # 1. Extract official openssl-1.0.2zl archive
+  tar -xzf openssl-1.0.2zl.tar.gz
+  cd openssl-1.0.2zl
+
+  # 2. Download delta patch script
+  curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch-openssl-1.0.2zl-to-1.0.2zs.sh
+  chmod +x patch-openssl-1.0.2zl-to-1.0.2zs.sh
+
+  # 3. Verify via dry run, then build and test
+  ./patch-openssl-1.0.2zl-to-1.0.2zs.sh --dry-run
+  ./patch-openssl-1.0.2zl-to-1.0.2zs.sh --build --test
+  ```
+
+### 1.3. Workflow B2: In-Tree Patching on Public Upstream OpenSSL 1.0.2u
+
+- **Architecture**:
+  For public community users starting from the public 2019 EOL release (`openssl-1.0.2u.tar.gz`), [`patch-openssl-1.0.2u-to-1.0.2zs.sh`](patch-openssl-1.0.2u-to-1.0.2zs.sh) (or [`patch.sh`](patch.sh)) applies all 40 cumulative CVE mitigations covering 2020 through 2026.
+- **Execution Protocol**:
+
+  ```bash
+  # 1. Extract the authentic upstream OpenSSL 1.0.2u archive
   tar -xzf openssl-1.0.2u.tar.gz
   cd openssl-1.0.2u
 
-  # 2. Copy the standalone patch engine into the root of the source directory
+  # 2. Download patch engine
   curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch.sh
-  curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch-openssl-1.0.2u-to-1.0.2zr.sh
-  chmod +x patch.sh patch-openssl-1.0.2u-to-1.0.2zr.sh
+  curl -fsSL -O https://raw.githubusercontent.com/alsyundawy/openssl-1.0.2/main/patch-openssl-1.0.2u-to-1.0.2zs.sh
+  chmod +x patch.sh patch-openssl-1.0.2u-to-1.0.2zs.sh
 
-  # 3. Execute dry-run verification (safe, read-only analysis)
+  # 3. Dry-run and execute
   ./patch.sh --dry-run
-
-  # 4. Apply the complete hardening patchset (automatically creates timestamped backup)
-  ./patch.sh
-
-  # 5. Compile and test the newly hardened source tree
-  ./config shared no-ssl2 no-ssl3 no-comp no-zlib no-weak-ssl-ciphers -DOPENSSL_NO_HEARTBEATS
-  make depend
-  make -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
-  make test
+  ./patch.sh --build --test
   ```
 
-### 1.3. The 8-Phase Patch Engine Architecture (`patch-openssl-1.0.2u-to-1.0.2zr.sh`)
+### 1.4. The 8-Phase Patch Engine Architecture
 
-The standalone engine executes across eight sequential, atomic phases:
+Both patch engines execute across eight sequential, atomic phases:
 
 1. **Phase 1: Preflight Tooling & Environment Verification**:
    Validates host toolchain requirements: Perl 5, ANSI C compiler (`gcc` or `clang`), and POSIX `make`.
 2. **Phase 2: Source Tree Authenticity & Legacy Version Check**:
    Verifies that the target directory is an authentic OpenSSL 1.0.2 source tree by parsing `crypto/opensslv.h` and checking the directory structure (`crypto/`, `ssl/`).
 3. **Phase 3: Disaster Recovery Non-Destructive Backup Snapshots**:
-   Before modifying any file, creates an atomic snapshot of all target files into `.openssl102zr-security-backup-YYYYMMDD-HHMMSS/`.
-4. **Phase 4: Idempotent AST/Source Patch Application (31 Mitigations)**:
+   Before modifying any file, creates an atomic snapshot of all target files into `.openssl102zs-security-backup-YYYYMMDD-HHMMSS/`.
+4. **Phase 4: Idempotent AST/Source Patch Application**:
    Applies AST-bounded patches to C files with strict idempotency guards (`ALSYUNDAWY-CVE-*`). Re-running skips already-patched files cleanly without duplicate blocks.
 5. **Phase 5: Post-Patch Pattern Audit & Security Marker Verification**:
-   Inspects all modified files to ensure that 17+ essential defensive security tags are properly placed in the AST.
+   Inspects all modified files to ensure that all essential defensive security tags are properly placed in the AST.
 6. **Phase 6: Production Hardened Compilation & Linker Validation (`--build`)**:
    Optional automated build runner applying `-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security`.
 7. **Phase 7: Comprehensive Cryptographic Test Suite Execution (`--test`)**:
@@ -186,23 +208,23 @@ The standalone engine executes across eight sequential, atomic phases:
 8. **Phase 8: Audit Logging, Diff Reporting & Clean State Finalization**:
    Outputs patch logs, diff summaries, and confirms the tree is ready for production.
 
-### 1.4. Disaster Recovery & Atomic Rollback Protocol
+### 1.5. Disaster Recovery & Atomic Rollback Protocol
 
 If a build fails or if an environment must be restored to its pristine upstream state:
 
 ```bash
 # Automated atomic rollback via patch engine
-./patch.sh --rollback .openssl102zr-security-backup-YYYYMMDD-HHMMSS
+./patch-openssl-1.0.2zl-to-1.0.2zs.sh --rollback .openssl102zs-security-backup-YYYYMMDD-HHMMSS
 
 # Manual atomic restoration
-cp -a .openssl102zr-security-backup-YYYYMMDD-HHMMSS/* .
+cp -a .openssl102zs-security-backup-YYYYMMDD-HHMMSS/* .
 ```
 
 ---
 
-## 2. Complete OpenSSL 1.0.2 Vulnerability Inventory (2020–2026)
+## 2. Complete OpenSSL 1.0.2 Vulnerability Inventory (40 CVEs, 2020–2026)
 
-The following inventory lists all 37 vulnerabilities affecting OpenSSL 1.0.2 published by the OpenSSL Project between 2020-01-01 and 2026-08-25 (source: <https://openssl-library.org/news/vulnerabilities-1.0.2/>):
+The following inventory lists all 40 vulnerabilities affecting OpenSSL 1.0.2 published by the OpenSSL Project between 2020-01-01 and 2026-09-29 (source: <https://openssl-library.org/news/vulnerabilities-1.0.2/>):
 
 | CVE ID             | Severity | Published Date | 1.0.2 Upstream Target | Issue Summary & Scope                                                                        |
 | :----------------- | :------- | :------------- | :-------------------- | :------------------------------------------------------------------------------------------- |
@@ -251,7 +273,61 @@ The following inventory lists all 37 vulnerabilities affecting OpenSSL 1.0.2 pub
 
 ## 3. Deep Technical Vulnerability Analysis & Hardening Details
 
-### 3.1. DTLS Record Layer Memory Amplification (CVE-2026-54874)
+### 3.1. DTLS Handshake Retransmission Out-Of-Bounds Read (CVE-2026-84782)
+
+- **Subsystems**: `ssl/d1_both.c` (`dtls1_retransmit_message`) and `ssl/d1_lib.c` (`dtls1_handle_timeout`)
+- **Severity**: High (CVSS 8.2)
+- **Vulnerability Mechanism**: In non-blocking DTLS transports, a handshake message write can suspend mid-way (returning `WANT_WRITE`) leaving `s->init_off` non-zero. If the DTLS retransmission timer expires while a write is paused, `dtls1_retransmit_message` re-sent the earlier message without resetting `s->init_off` to zero. As a result, `dtls1_do_write` wrote from `s->init_buf->data + s->init_off`, reading trailing heap data or out-of-bounds bytes and transmitting them in plaintext. Additionally, concurrent retransmissions corrupted in-flight write state.
+- **Defensive Mitigation**:
+  Explicitly resets `s->init_off = 0` before retransmitting, and skips timeout retransmissions if a handshake write is currently suspended:
+
+  ```c
+  /* ALSYUNDAWY-CVE-2026-84782: reset init_off to prevent reading from stale offset */
+  s->init_off = 0;
+  ```
+
+  And in `ssl/d1_lib.c`:
+
+  ```c
+  /* ALSYUNDAWY-CVE-2026-84782: guard against corrupting in-flight partial writes */
+  if (s->init_off != 0 || s->init_num != 0)
+      return 0;
+  ```
+
+### 3.2. Relative CRLDP Excessive Memory Allocation (CVE-2026-35189)
+
+- **Subsystems**: `crypto/x509v3/v3_purp.c` (`setup_dp`), `crypto/x509/x509_vfy.c` (`crl_crldp_check`), and `crypto/x509v3/v3_crld.c` (`DIST_POINT_set_dpname`)
+- **Severity**: Low / Moderate DoS (CVSS 5.3)
+- **Vulnerability Mechanism**: During X.509 extension caching on every certificate received during a TLS handshake, `setup_dp()` eagerly called `DIST_POINT_set_dpname` for every relative distribution point (`nameRelativeToCRLIssuer`). Each invocation cloned issuer names with `X509_NAME_dup()` and generated cached DER encodings. Malicious certificates containing hundreds or thousands of relative distribution points consumed several hundred megabytes of resident heap memory per handshake, causing Denial of Service.
+- **Defensive Mitigation**:
+  Postpones full name computation in `setup_dp()`, performing `DIST_POINT_set_dpname` strictly on demand only when a candidate CRL is actively matched in `crl_crldp_check()`:
+
+  ```c
+  /* ALSYUNDAWY-CVE-2026-35189: on-demand computation only when checking candidate CRL */
+  if (dp->distpoint && dp->distpoint->type == 1 && dp->distpoint->dpname == NULL) {
+      /* compute iname and invoke DIST_POINT_set_dpname on demand */
+  }
+  ```
+
+### 3.3. Timing Side-Channel in Generic EC Scalar Multiplication (CVE-2026-54872)
+
+- **Subsystem**: `crypto/ec/ec_mult.c` (`ec_mul_consttime`)
+- **Severity**: Low / Moderate Side-Channel (CVSS 3.7)
+- **Vulnerability Mechanism**: Generic elliptic-curve scalar multiplication used for ECDSA and SM2 signatures on non-NIST curves (such as Brainpool curves) padded secret scalars using variable-time `BIGNUM` operations (`BN_add`). Leading zero limb normalization via `bn_correct_top()` caused execution times to fluctuate depending on the secret scalar nonce, permitting private key recovery through lattice/Hidden Number Problem (HNP) attacks.
+- **Defensive Mitigation**:
+  Enforces constant-time, length-invariant scalar padding with full fixed limb width (`group_top + 2`) without trimming leading zeros, and asserts `BN_FLG_CONSTTIME` and `BN_FLG_FIXED_TOP` across all scalar operations:
+
+  ```c
+  /* ALSYUNDAWY-CVE-2026-54872: enforce fixed limb width and constant-time flags */
+  while (k->top < group_top + 2)
+      k->d[k->top++] = 0;
+  while (lambda->top < group_top + 2)
+      lambda->d[lambda->top++] = 0;
+  BN_set_flags(k, BN_FLG_CONSTTIME | BN_FLG_FIXED_TOP);
+  BN_set_flags(lambda, BN_FLG_CONSTTIME | BN_FLG_FIXED_TOP);
+  ```
+
+### 3.4. DTLS Record Layer Memory Amplification (CVE-2026-54874)
 
 - **Subsystem**: `ssl/d1_pkt.c` (`dtls1_buffer_record`)
 - **Severity**: Low / Moderate DoS
@@ -271,7 +347,7 @@ The following inventory lists all 37 vulnerabilities affecting OpenSSL 1.0.2 pub
   memcpy(rdata->packet, s->packet, s->packet_length);
   ```
 
-### 3.2. CMS KARI KEK Unwrap Buffer Sizing (CVE-2026-63072 / CVE-2025-9230)
+### 3.5. CMS KARI KEK Unwrap Buffer Sizing (CVE-2026-63072 / CVE-2025-9230)
 
 - **Subsystem**: `crypto/cms/cms_kari.c` (`cms_kek_cipher`)
 - **Severity**: Moderate
@@ -290,7 +366,7 @@ The following inventory lists all 37 vulnerabilities affecting OpenSSL 1.0.2 pub
   out = OPENSSL_malloc(outsize);
   ```
 
-### 3.3. PKCS#7 Verification Use-After-Free (CVE-2026-45447)
+### 3.6. PKCS#7 Verification Use-After-Free (CVE-2026-45447)
 
 - **Subsystem**: `crypto/pkcs7/pk7_smime.c` (`PKCS7_verify`)
 - **Severity**: High
@@ -307,7 +383,7 @@ The following inventory lists all 37 vulnerabilities affecting OpenSSL 1.0.2 pub
   }
   ```
 
-### 3.4. ASN.1 Primitive Content & Multibyte Boundaries (CVE-2026-34180, CVE-2026-7383)
+### 3.7. ASN.1 Primitive Content & Multibyte Boundaries (CVE-2026-34180, CVE-2026-7383)
 
 - **Subsystems**: `crypto/asn1/tasn_dec.c` and `crypto/asn1/a_mbstr.c`
 - **Severity**: Low
@@ -315,59 +391,13 @@ The following inventory lists all 37 vulnerabilities affecting OpenSSL 1.0.2 pub
 - **Defensive Mitigation**:
   Enforces upper bounds against `INT_MAX` on primitive lengths and guards bitwise shift operations against values $\ge 32$.
 
-### 3.5. CMS Password-Based Encryption Bounds (CVE-2026-9076, CVE-2026-42766, CVE-2025-9230)
+### 3.8. CMS Password-Based Encryption Bounds (CVE-2026-9076, CVE-2026-42766, CVE-2025-9230)
 
 - **Subsystem**: `crypto/cms/cms_pwri.c`
 - **Severity**: Low / Moderate
 - **Vulnerability Mechanism**: Stream ciphers lacking fixed block sizes triggered zero-division or invalid pointer indexing when unwrapping password-encrypted recipient info keys. Additionally, NULL dereferences occurred when optional KDF structures were omitted.
 - **Defensive Mitigation**:
   Rejects ciphers with block size $< 4$, validates RFC3211 KEK unwrap lengths, and verifies KDF algorithm structure pointers before access.
-
-### 3.6. DTLS Retransmits From Stale Buffer Offset (CVE-2026-84782)
-
-- **Subsystems**: `ssl/d1_both.c` (`dtls1_retransmit_message`) and `ssl/d1_lib.c` (`dtls1_handle_timeout`)
-- **Severity**: High (CVSS 8.2)
-- **Vulnerability Mechanism**: In non-blocking DTLS transports, a handshake message write can suspend mid-way (returning `WANT_WRITE`) leaving `s->init_off` non-zero. If the DTLS retransmission timer expires while a write is paused, `dtls1_retransmit_message` re-sent the earlier message without resetting `s->init_off` to zero. As a result, `dtls1_do_write` wrote from `s->init_buf->data + s->init_off`, reading trailing heap data or out-of-bounds bytes and transmitting them in plaintext. Additionally, concurrent retransmissions corrupted in-flight write state.
-- **Defensive Mitigation**:
-  Explicitly resets `s->init_off = 0` before retransmitting, and skips timeout retransmissions if a handshake write is currently suspended:
-
-  ```c
-  /* ALSYUNDAWY-CVE-2026-84782: reset init_off to prevent reading from stale offset */
-  s->init_off = 0;
-  ```
-
-### 3.7. Excessive Memory Allocation in Relative CRLDP (CVE-2026-35189)
-
-- **Subsystems**: `crypto/x509v3/v3_purp.c` (`setup_dp`), `crypto/x509/x509_vfy.c` (`crl_crldp_check`), and `crypto/x509v3/v3_crld.c` (`DIST_POINT_set_dpname`)
-- **Severity**: Low (CVSS 5.3)
-- **Vulnerability Mechanism**: During X.509 extension caching on every certificate received during a TLS handshake, `setup_dp()` eagerly called `DIST_POINT_set_dpname` for every relative distribution point (`nameRelativeToCRLIssuer`). Each invocation cloned issuer names with `X509_NAME_dup()` and generated cached DER encodings. Malicious certificates containing hundreds or thousands of relative distribution points consumed several hundred megabytes of resident heap memory per handshake, causing Denial of Service.
-- **Defensive Mitigation**:
-  Postpones full name computation in `setup_dp()`, performing `DIST_POINT_set_dpname` strictly on demand only when a candidate CRL is actively matched in `crl_crldp_check()`:
-
-  ```c
-  /* ALSYUNDAWY-CVE-2026-35189: on-demand computation only when checking candidate CRL */
-  if (dp->distpoint && dp->distpoint->type == 1 && dp->distpoint->dpname == NULL) {
-      /* compute iname and invoke DIST_POINT_set_dpname on demand */
-  }
-  ```
-
-### 3.8. Timing Side-Channel in Generic EC Scalar Multiplication (CVE-2026-54872)
-
-- **Subsystem**: `crypto/ec/ec_mult.c` (`ec_mul_consttime`)
-- **Severity**: Low (CVSS 3.7)
-- **Vulnerability Mechanism**: Generic elliptic-curve scalar multiplication used for ECDSA and SM2 signatures on non-NIST curves (such as Brainpool curves) padded secret scalars using variable-time `BIGNUM` operations (`BN_add`). Leading zero limb normalization via `bn_correct_top()` caused execution times to fluctuate depending on the secret scalar nonce, permitting private key recovery through lattice/Hidden Number Problem (HNP) attacks.
-- **Defensive Mitigation**:
-  Enforces constant-time, length-invariant scalar padding with full fixed limb width (`group_top + 2`) without trimming leading zeros, and asserts `BN_FLG_CONSTTIME` and `BN_FLG_FIXED_TOP` across all scalar operations:
-
-  ```c
-  /* ALSYUNDAWY-CVE-2026-54872: enforce fixed limb width and constant-time flags */
-  while (k->top < group_top + 2)
-      k->d[k->top++] = 0;
-  while (lambda->top < group_top + 2)
-      lambda->d[lambda->top++] = 0;
-  BN_set_flags(k, BN_FLG_CONSTTIME | BN_FLG_FIXED_TOP);
-  BN_set_flags(lambda, BN_FLG_CONSTTIME | BN_FLG_FIXED_TOP);
-  ```
 
 ---
 
@@ -425,7 +455,7 @@ make test
 Verify all security markers in the source files:
 
 ```bash
-# 1. Inspect ALSYUNDAWY CVE markers (expected: >= 22 instances)
+# 1. Inspect ALSYUNDAWY CVE markers (expected: >= 25 instances)
 grep -R "ALSYUNDAWY-CVE-" crypto/ ssl/
 
 # 2. Inspect CMS memory cleansing markers
@@ -437,21 +467,21 @@ grep -n "OPENSSL_VERSION_TEXT" crypto/opensslv.h
 
 ### 5.2. Atomic Rollback Execution
 
-If you need to revert changes to the state before running `patch-openssl-1.0.2u-to-1.0.2zr.sh` (or `patch-openssl-1.0.2u-to-1.0.2zs.sh`):
+If you need to revert changes to the state before running the patch engines:
 
 ```bash
 # Automated atomic rollback
-./patch-openssl-1.0.2u-to-1.0.2zr.sh --rollback .openssl102zs-security-backup-YYYYMMDD-HHMMSS
+./patch-openssl-1.0.2zl-to-1.0.2zs.sh --rollback .openssl102zs-security-backup-YYYYMMDD-HHMMSS
 
 # Or manual restoration via POSIX copy
-cp -a .openssl102zr-security-backup-YYYYMMDD-HHMMSS/* .
+cp -a .openssl102zs-security-backup-YYYYMMDD-HHMMSS/* .
 ```
 
 ---
 
-## 6. MegaLinter Zero-Error Compliance & 13-Dimension Code Review
+## 6. Comprehensive 14-Point Production Code Review & Verification
 
-### 6.1. MegaLinter Remediation Architecture
+### 6.1. Multi-Linter Remediation Architecture
 
 This repository is hardened against all 17 descriptor suites reported in MegaLinter analysis:
 
@@ -461,23 +491,26 @@ This repository is hardened against all 17 descriptor suites reported in MegaLin
 - **Domain Dictionary & Link Checker**: `.cspell.json` includes 3,296 cryptographic and project-specific terms; `.lycheeignore` excludes documentation example URLs.
 - **POSIX Script Permissions**: All shell scripts are standardized with executable permissions (`+x`), satisfying `bash-exec`.
 
-### 6.2. 13-Dimension Verification Summary
+### 6.2. 14-Dimension Verification Matrix
+
+Based on the authoritative production code review ([`openssl-1.0.2zs-final-code-review.md`](openssl-1.0.2zs-final-code-review.md)):
 
 | Dimension | Verification Evidence | Result |
 | :--- | :--- | :--- |
-| **Bug Review** | 100% test pass on `make test` (1908 constant-time, DTLS, OCSP, CMS, PKCS#7) | :white_check_mark: PASSED |
-| **Syntax Review** | All scripts ShellCheck-clean; workflows 100% valid YAML; configs 100% valid JSON | :white_check_mark: PASSED |
-| **Runtime Review** | Version string and runtime initialization verified | :white_check_mark: PASSED |
-| **Logic Review** | 31 CVE mitigations verified idempotent via `./patch.sh --dry-run` | :white_check_mark: PASSED |
-| **Memory Review** | DTLS record wire-length allocations and CMS zeroization validated | :white_check_mark: PASSED |
-| **Dead Code Review** | Redundant worktree exclusions added to `.gitignore` and `.mega-linter.yml` | :white_check_mark: PASSED |
-| **Duplicate Code Review** | Crypto block cipher repetitions isolated from copy-paste scanners | :white_check_mark: PASSED |
-| **Circular Dependency** | Header tree dependency graphs verified acyclic | :white_check_mark: PASSED |
-| **Performance Bottleneck** | Memory amplification elimination in DTLS record layer confirmed | :white_check_mark: PASSED |
-| **Security Vulnerability** | All 37 CVEs mitigated; CI credential exposure remediated | :white_check_mark: PASSED |
-| **Maintainability** | Centralized `.mega-linter.yml` configuration implemented | :white_check_mark: PASSED |
-| **Scalability** | Scoped linter paths reducing CI runtime overhead | :white_check_mark: PASSED |
-| **Readability** | Clean Keep a Changelog and DOCNOTE specifications | :white_check_mark: PASSED |
+| **1. Bug Review** | Boundary checks in DTLS buffer offsets; NULL guards in CRLDP lookups; fixed limb indexing in EC scalar ladder | :white_check_mark: PASSED |
+| **2. Syntax Review** | 100% ANSI C89 / ISO C90 compliant. All variable declarations scoped at block entry. ShellCheck clean | :white_check_mark: PASSED |
+| **3. Runtime Review** | Shared libraries link cleanly; version banner verified (`OpenSSL 1.0.2zs-alsyundawy-u20260929  29 Sep 2026`); 100% `make test` pass | :white_check_mark: PASSED |
+| **4. Logic Review** | DTLS write state machine protected during partial writes; on-demand relative CRLDP evaluation prevents premature resolution | :white_check_mark: PASSED |
+| **5. Memory Review** | CWE-770 (memory exhaustion) eliminated; CWE-125 (heap OOB read) eliminated; zero memory leaks across test passes | :white_check_mark: PASSED |
+| **6. Dead Code Review** | Unused variables (`iname`, `i` in `v3_purp.c`) cleanly excised; zero orphan code or debug remnants | :white_check_mark: PASSED |
+| **7. Duplicate Code Review** | Relative issuer lookup consolidated into single execution path in `x509_vfy.c`; zero copy-paste redundancy | :white_check_mark: PASSED |
+| **8. Circular Dependency** | Header tree dependency graphs verified acyclic (DAG); zero cyclic includes between `crypto/` and `ssl/` | :white_check_mark: PASSED |
+| **9. Performance Bottleneck** | Certificate parsing speed improved for certs with CRLDPs; EC constant-time padding incurs negligible overhead | :white_check_mark: PASSED |
+| **10. Security Vulnerability** | All 3 1.0.2zs CVEs (CVE-2026-84782, CVE-2026-35189, CVE-2026-54872) fully mitigated; cumulative 40 CVEs protected | :white_check_mark: PASSED |
+| **11. Maintainability** | Canonical `ALSYUNDAWY-CVE-` markers; synchronized documentation (`DOCNOTE.md`, `CHANGELOG.md`, `README.md`, `NEWS`, `CHANGES`) | :white_check_mark: PASSED |
+| **12. Scalability** | Client certificate flood memory footprint reduced by orders of magnitude; DTLS lossy network retransmission stabilized | :white_check_mark: PASSED |
+| **13. Readability** | Adheres strictly to OpenSSL K&R C89 conventions; descriptive variable names and explanatory comments | :white_check_mark: PASSED |
+| **14. Portability / ABI Compliance** | Strict ABI/API parity with upstream OpenSSL 1.0.2; zero struct offset shifts or exported symbol disruptions | :white_check_mark: PASSED |
 
 ---
 
